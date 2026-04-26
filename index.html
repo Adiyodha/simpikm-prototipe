@@ -1,0 +1,3071 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SIMPIKM — Sistem Informasi Manajemen Pembinaan IKM Terintegrasi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+  :root {
+    --teal-50: #e1f5ee;
+    --teal-100: #9fe1cb;
+    --teal-200: #5dcaa5;
+    --teal-400: #1d9e75;
+    --teal-600: #0f6e56;
+    --teal-800: #085041;
+    --teal-900: #04342c;
+    --coral-50: #faece7;
+    --coral-100: #f5c4b3;
+    --coral-400: #d85a30;
+    --coral-600: #993c1d;
+    --coral-800: #712b13;
+    --amber-50: #faeeda;
+    --amber-400: #ef9f27;
+    --amber-600: #854f0b;
+    --red-50: #fcebeb;
+    --red-400: #e24b4a;
+    --red-600: #a32d2d;
+    --cream: #faf8f3;
+    --cream-dark: #f2ede2;
+    --ink: #1a2e2b;
+    --ink-muted: #5a6b6a;
+    --ink-soft: #8a9594;
+    --line: #e6ddc9;
+    --line-soft: #efe8d7;
+    --white: #ffffff;
+    --shadow-sm: 0 1px 2px rgba(26,46,43,0.04);
+    --shadow-md: 0 4px 16px rgba(26,46,43,0.06);
+    --shadow-lg: 0 12px 40px rgba(26,46,43,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  .font-display { font-family: 'Fraunces', Georgia, serif; font-weight: 500; letter-spacing: -0.01em; }
+  .font-mono { font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace; font-size: 12px; }
+
+  /* ============ APP SHELL ============ */
+  .app {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    background: var(--white);
+    border-right: 1px solid var(--line);
+    padding: 24px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand {
+    padding: 0 24px 24px;
+    border-bottom: 1px solid var(--line-soft);
+    margin-bottom: 16px;
+  }
+
+  .brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .brand-mark {
+    width: 36px; height: 36px;
+    background: var(--teal-600);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--white);
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: -0.02em;
+  }
+
+  .brand-mark::after {
+    content: '';
+    position: absolute;
+    width: 8px; height: 8px;
+    background: var(--coral-400);
+    border-radius: 50%;
+    margin-left: 26px; margin-top: 22px;
+    border: 2px solid var(--white);
+  }
+
+  .brand-name {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+
+  .brand-tag {
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  .brand-subtitle {
+    font-size: 11px;
+    color: var(--ink-muted);
+    line-height: 1.4;
+    margin-top: 10px;
+  }
+
+  .nav-group-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 700;
+    padding: 14px 24px 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 24px;
+    color: var(--ink-muted);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+
+  .nav-item:hover {
+    background: var(--cream-dark);
+    color: var(--ink);
+  }
+
+  .nav-item.active {
+    background: var(--teal-50);
+    color: var(--teal-800);
+    border-left-color: var(--teal-600);
+    font-weight: 600;
+  }
+
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 20px 24px;
+    border-top: 1px solid var(--line-soft);
+  }
+
+  .user-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: var(--cream);
+    border-radius: 10px;
+  }
+
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--coral-100);
+    color: var(--coral-800);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  .user-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+
+  .user-role {
+    font-size: 10px;
+    color: var(--ink-soft);
+    line-height: 1.3;
+  }
+
+  /* ============ MAIN ============ */
+  .main {
+    padding: 28px 36px 60px;
+    max-width: 1280px;
+    width: 100%;
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .page-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--coral-400);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .page-title {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  .page-subtitle {
+    color: var(--ink-muted);
+    font-size: 14px;
+    margin-top: 6px;
+    max-width: 560px;
+  }
+
+  .page-actions { display: flex; gap: 10px; align-items: center; }
+
+  /* ============ COMPONENTS ============ */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--white);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn:hover { border-color: var(--teal-400); color: var(--teal-800); }
+  .btn-primary {
+    background: var(--teal-600);
+    color: var(--white);
+    border-color: var(--teal-600);
+  }
+  .btn-primary:hover { background: var(--teal-800); color: var(--white); border-color: var(--teal-800); }
+  .btn-coral {
+    background: var(--coral-400);
+    color: var(--white);
+    border-color: var(--coral-400);
+  }
+  .btn-coral:hover { background: var(--coral-600); color: var(--white); border-color: var(--coral-600); }
+  .btn svg { width: 14px; height: 14px; }
+
+  .card {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+  }
+
+  .card-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 18px;
+  }
+
+  .card-title {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+
+  .card-subtitle {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+
+  /* KPI Cards */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .kpi-card {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--teal-600);
+  }
+  .kpi-card.coral::before { background: var(--coral-400); }
+  .kpi-card.amber::before { background: var(--amber-400); }
+  .kpi-card.ink::before { background: var(--ink); }
+
+  .kpi-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .kpi-value {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .kpi-unit {
+    font-size: 13px;
+    color: var(--ink-muted);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 500;
+  }
+
+  .kpi-delta {
+    font-size: 12px;
+    color: var(--teal-600);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .kpi-delta.neg { color: var(--coral-600); }
+
+  /* Grid layouts */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+  .grid-split { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+
+  /* Chart containers */
+  .chart-wrap { position: relative; width: 100%; }
+  .chart-h-220 { height: 220px; }
+  .chart-h-260 { height: 260px; }
+  .chart-h-300 { height: 300px; }
+  .chart-h-340 { height: 340px; }
+
+  /* Badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-paripurna { background: var(--teal-50); color: var(--teal-800); }
+  .badge-proses { background: var(--amber-50); color: var(--amber-600); }
+  .badge-belum { background: var(--red-50); color: var(--red-600); }
+
+  .badge-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    display: inline-block;
+  }
+  .badge-paripurna .badge-dot { background: var(--teal-400); }
+  .badge-proses .badge-dot { background: var(--amber-400); }
+  .badge-belum .badge-dot { background: var(--red-400); }
+
+  /* Table */
+  .table-wrap {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .table-filters {
+    display: flex;
+    gap: 10px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line-soft);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .input, .select {
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--white);
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    outline: none;
+    transition: border 0.15s;
+  }
+  .input:focus, .select:focus { border-color: var(--teal-400); }
+  .input { flex: 1; min-width: 200px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead {
+    background: var(--cream);
+  }
+
+  th {
+    text-align: left;
+    padding: 12px 18px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    font-weight: 700;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  td {
+    padding: 14px 18px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: middle;
+  }
+
+  tbody tr { cursor: pointer; transition: background 0.1s; }
+  tbody tr:hover { background: var(--cream); }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .ikm-name { font-weight: 600; color: var(--ink); }
+  .ikm-id { font-family: 'SF Mono', monospace; font-size: 11px; color: var(--ink-soft); }
+
+  /* Progress bar in table */
+  .progress-inline {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .progress-bar {
+    width: 90px; height: 6px;
+    background: var(--line-soft);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--teal-400);
+    border-radius: 10px;
+  }
+  .progress-fill.amber { background: var(--amber-400); }
+  .progress-fill.red { background: var(--red-400); }
+  .progress-text {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Pillar gauge (for IKM detail) */
+  .pilar-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .pilar-card {
+    background: var(--cream);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+
+  .pilar-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .pilar-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .pilar-pct {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--teal-800);
+  }
+
+  .pilar-bar {
+    height: 5px;
+    background: var(--line-soft);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .pilar-fill {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.4s ease;
+  }
+
+  .pilar-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+  }
+
+  .pilar-item {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 12px;
+    background: var(--white);
+    color: var(--ink-muted);
+    border: 1px solid var(--line-soft);
+  }
+
+  .pilar-item.done {
+    background: var(--teal-50);
+    color: var(--teal-800);
+    border-color: var(--teal-100);
+    font-weight: 600;
+  }
+
+  .pilar-item.done::before {
+    content: '✓ ';
+    color: var(--teal-600);
+  }
+
+  /* Modal */
+  .modal-bg {
+    position: fixed; inset: 0;
+    background: rgba(26, 46, 43, 0.5);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    z-index: 100;
+    padding: 60px 20px;
+    overflow-y: auto;
+  }
+  .modal-bg.active { display: flex; }
+  .modal {
+    background: var(--white);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 860px;
+    padding: 28px 32px;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ink-muted);
+    font-size: 22px;
+    padding: 0;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+  }
+  .modal-close:hover { background: var(--cream); color: var(--ink); }
+
+  .ikm-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+    padding: 14px 16px;
+    background: var(--cream);
+    border-radius: 10px;
+  }
+
+  .meta-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .meta-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* Timeline (pembinaan) */
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px; top: 8px; bottom: 8px;
+    width: 2px;
+    background: var(--line);
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-bottom: 20px;
+  }
+
+  .timeline-dot {
+    position: absolute;
+    left: -24px; top: 4px;
+    width: 14px; height: 14px;
+    background: var(--white);
+    border: 3px solid var(--teal-400);
+    border-radius: 50%;
+  }
+  .timeline-item.coral .timeline-dot { border-color: var(--coral-400); }
+  .timeline-item.amber .timeline-dot { border-color: var(--amber-400); }
+
+  .timeline-date {
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+
+  .timeline-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+
+  .timeline-body {
+    font-size: 13px;
+    color: var(--ink-muted);
+    line-height: 1.5;
+  }
+
+  .timeline-meta {
+    display: inline-flex;
+    gap: 10px;
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+
+  /* Upload area */
+  .upload-zone {
+    border: 2px dashed var(--line);
+    border-radius: 14px;
+    padding: 48px 24px;
+    text-align: center;
+    background: var(--cream);
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .upload-zone:hover {
+    border-color: var(--teal-400);
+    background: var(--teal-50);
+  }
+
+  .upload-icon {
+    width: 60px; height: 60px;
+    background: var(--white);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    color: var(--teal-600);
+  }
+  .upload-icon svg { width: 28px; height: 28px; }
+
+  /* Gap analysis heatmap */
+  .heatmap {
+    display: grid;
+    gap: 2px;
+    background: var(--line-soft);
+    padding: 1px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .heatmap-row { display: grid; grid-template-columns: 180px repeat(6, 1fr); gap: 2px; }
+  .heatmap-row.head .heatmap-cell { background: var(--cream); font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-soft); }
+  .heatmap-cell {
+    background: var(--white);
+    padding: 10px 12px;
+    font-size: 12px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .heatmap-cell.label { text-align: left; }
+  .heat-0 { background: #fef0ed; color: var(--coral-600); }
+  .heat-1 { background: #fde1d8; color: var(--coral-600); }
+  .heat-2 { background: #fad2c2; color: var(--coral-800); }
+  .heat-3 { background: #fde4c2; color: var(--amber-600); }
+  .heat-4 { background: #c0e4d5; color: var(--teal-800); }
+  .heat-5 { background: #9fe1cb; color: var(--teal-800); }
+  .heat-6 { background: var(--teal-400); color: var(--white); }
+
+  /* Recommendation list */
+  .rec-list { display: flex; flex-direction: column; gap: 10px; }
+  .rec-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--cream);
+    border-radius: 10px;
+    border-left: 3px solid var(--coral-400);
+  }
+  .rec-item.priority-high { border-left-color: var(--red-400); }
+  .rec-item.priority-med { border-left-color: var(--amber-400); }
+  .rec-item.priority-low { border-left-color: var(--teal-400); }
+
+  .rec-icon {
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--coral-600);
+    flex-shrink: 0;
+  }
+  .rec-item.priority-high .rec-icon { color: var(--red-600); }
+  .rec-item.priority-med .rec-icon { color: var(--amber-600); }
+  .rec-item.priority-low .rec-icon { color: var(--teal-800); }
+
+  .rec-body { flex: 1; }
+  .rec-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+  .rec-text { font-size: 12px; color: var(--ink-muted); line-height: 1.5; }
+
+  /* Page routing */
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Hero section on dashboard */
+  .hero {
+    background: linear-gradient(135deg, var(--teal-900) 0%, var(--teal-600) 100%);
+    border-radius: 16px;
+    padding: 28px 32px;
+    color: var(--white);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    background: var(--coral-400);
+    border-radius: 50%;
+    opacity: 0.15;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; right: 60px;
+    width: 140px; height: 140px;
+    background: var(--teal-200);
+    border-radius: 50%;
+    opacity: 0.1;
+  }
+
+  .hero-content { position: relative; z-index: 1; max-width: 70%; }
+  .hero-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--teal-100);
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .hero-title {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .hero-text { font-size: 13px; color: var(--teal-100); max-width: 520px; line-height: 1.55; }
+  .hero-stats { display: flex; gap: 32px; margin-top: 20px; }
+  .hero-stat-label { font-size: 11px; color: var(--teal-100); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; }
+  .hero-stat-value { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 500; margin-top: 2px; }
+
+  /* Success toast */
+  .toast {
+    position: fixed;
+    bottom: 30px; right: 30px;
+    background: var(--teal-800);
+    color: var(--white);
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 200;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.25s ease;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast-icon {
+    width: 22px; height: 22px;
+    background: var(--teal-400);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+
+  /* Empty state */
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--ink-soft); }
+
+  /* Sector icon */
+  .sector-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    background: var(--cream);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-muted);
+  }
+
+  /* Module intro */
+  .module-intro {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    border-left: 4px solid var(--coral-400);
+  }
+
+  .module-intro h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--ink);
+  }
+
+  .module-intro p {
+    font-size: 13px;
+    color: var(--ink-muted);
+    line-height: 1.55;
+  }
+
+  /* ============ TUPOKSI PAGE ============ */
+  .org-dinas-header {
+    background: linear-gradient(135deg, var(--teal-800), var(--teal-600));
+    color: var(--white);
+    border-radius: 14px 14px 0 0;
+    padding: 20px 24px;
+    text-align: center;
+    position: relative;
+  }
+  .org-dinas-header::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px; height: 12px;
+    background: var(--line);
+  }
+  .org-dinas-name {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .org-dinas-tag {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal-100);
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  .bidang-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .bidang-card {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .bidang-card:hover { border-color: var(--teal-400); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+  .bidang-card.active { border-color: var(--teal-600); background: var(--teal-50); }
+  .bidang-card.teal { border-left: 3px solid var(--teal-400); }
+  .bidang-card.coral { border-left: 3px solid var(--coral-400); }
+  .bidang-card.amber { border-left: 3px solid var(--amber-400); }
+
+  .bidang-kode {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+  }
+  .bidang-name {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 4px 0 8px;
+    line-height: 1.3;
+  }
+  .bidang-fokus {
+    font-size: 11px;
+    color: var(--ink-muted);
+    line-height: 1.5;
+    margin-bottom: 10px;
+    min-height: 44px;
+  }
+  .bidang-stats {
+    display: flex;
+    gap: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .bidang-stat {
+    flex: 1;
+  }
+  .bidang-stat-val {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--teal-800);
+  }
+  .bidang-stat-label {
+    font-size: 10px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+
+  .upt-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .upt-card {
+    background: var(--cream);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .upt-num {
+    width: 28px; height: 28px;
+    background: var(--white);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--teal-800);
+    flex-shrink: 0;
+  }
+  .upt-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+  .upt-meta {
+    font-size: 10px;
+    color: var(--ink-soft);
+    margin-top: 3px;
+    display: flex;
+    gap: 8px;
+  }
+
+  /* Tupoksi matrix (RACI) */
+  .raci-matrix {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 2px;
+    background: var(--line-soft);
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 2px;
+  }
+  .raci-matrix th, .raci-matrix td {
+    background: var(--white);
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 11px;
+    border: none;
+  }
+  .raci-matrix th { background: var(--cream); font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.06em; font-size: 10px; }
+  .raci-matrix th.row-head { text-align: left; padding-left: 14px; }
+  .raci-matrix td.row-head { background: var(--white); text-align: left; padding-left: 14px; font-weight: 600; font-size: 12px; color: var(--ink); }
+  .raci-cell {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 12px;
+    font-family: 'Fraunces', serif;
+  }
+  .raci-A { background: var(--coral-400); color: var(--white); }
+  .raci-R { background: var(--teal-400); color: var(--white); }
+  .raci-S { background: var(--amber-50); color: var(--amber-600); border: 1px solid var(--amber-400); }
+  .raci-C { background: var(--cream-dark); color: var(--ink-soft); }
+  .raci-empty { color: var(--ink-soft); font-size: 14px; }
+
+  .raci-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+    padding: 12px 14px;
+    background: var(--cream);
+    border-radius: 10px;
+    flex-wrap: wrap;
+  }
+  .raci-legend-item {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 11px;
+    color: var(--ink-muted);
+  }
+  .raci-legend-item .raci-cell { width: 20px; height: 20px; font-size: 10px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">
+        <div class="brand-mark" style="position: relative;">S</div>
+        <div>
+          <div class="brand-name">SIMPIKM</div>
+          <div class="brand-tag">Disperindag Jatim</div>
+        </div>
+      </div>
+      <div class="brand-subtitle">Sistem Informasi Manajemen Pembinaan IKM Terintegrasi</div>
+    </div>
+
+    <nav>
+      <div class="nav-group-label">Modul Utama</div>
+      <div class="nav-item active" data-page="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item" data-page="profil">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profil IKM
+      </div>
+      <div class="nav-item" data-page="pembinaan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Riwayat Pembinaan
+      </div>
+      <div class="nav-item" data-page="pelayanan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Pelayanan
+      </div>
+      <div class="nav-item" data-page="analitik">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Analitik Paripurna
+      </div>
+      <div class="nav-item" data-page="tupoksi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="16" y="16" width="6" height="6" rx="1"/><path d="M12 8v4M12 12H5v4M12 12h7v4"/></svg>
+        Koordinasi Tupoksi
+      </div>
+
+      <div class="nav-group-label">Data Management</div>
+      <div class="nav-item" data-page="upload">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Upload Data
+      </div>
+      <div class="nav-item" data-page="tentang">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        Tentang IKM Paripurna
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="avatar">AA</div>
+        <div>
+          <div class="user-name">Adiyodha A. W.</div>
+          <div class="user-role">Pembina Industri</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-eyebrow">Ringkasan Umum</div>
+          <h1 class="page-title">Dashboard SIMPIKM</h1>
+          <p class="page-subtitle">Pantau performa pembinaan IKM Paripurna di seluruh Jawa Timur dalam satu tampilan terintegrasi.</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Oktober 2026
+          </button>
+          <button class="btn btn-primary" onclick="exportReport()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export Laporan
+          </button>
+        </div>
+      </div>
+
+      <div class="hero">
+        <div class="hero-content">
+          <div class="hero-eyebrow">Program Prioritas 2026</div>
+          <div class="hero-title">IKM Paripurna: Rantai Nilai Terintegrasi</div>
+          <div class="hero-text">Mewujudkan IKM Jatim yang legal, kompetitif, dan berdaya saing global melalui pembinaan holistik dari <strong>Bahan Baku hingga Pemasaran</strong>, yang dikoordinasikan secara sinergis oleh 6 Bidang & 14 UPT.</div>
+          <div class="hero-stats">
+            <div>
+              <div class="hero-stat-label">Target 2026</div>
+              <div class="hero-stat-value">150 IKM</div>
+            </div>
+            <div>
+              <div class="hero-stat-label">Capaian Saat Ini</div>
+              <div class="hero-stat-value" id="hero-capaian">47 IKM</div>
+            </div>
+            <div>
+              <div class="hero-stat-label">Progres</div>
+              <div class="hero-stat-value" id="hero-progres">31%</div>
+            </div>
+            <div>
+              <div class="hero-stat-label">Unit Pelaksana</div>
+              <div class="hero-stat-value">6 + 14</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Total IKM Terdaftar</div>
+          <div class="kpi-value" id="kpi-total">—</div>
+          <div class="kpi-delta">↑ 4 IKM bulan ini</div>
+        </div>
+        <div class="kpi-card coral">
+          <div class="kpi-label">IKM Paripurna</div>
+          <div class="kpi-value" id="kpi-paripurna">—</div>
+          <div class="kpi-delta">↑ 2 bulan ini</div>
+        </div>
+        <div class="kpi-card amber">
+          <div class="kpi-label">Dalam Pembinaan</div>
+          <div class="kpi-value" id="kpi-proses">—</div>
+          <div class="kpi-delta">On-track</div>
+        </div>
+        <div class="kpi-card ink">
+          <div class="kpi-label">Kegiatan Bulan Ini</div>
+          <div class="kpi-value" id="kpi-kegiatan">—</div>
+          <div class="kpi-delta">↑ 18% vs Sep</div>
+        </div>
+      </div>
+
+      <div class="grid-3" style="margin-bottom: 16px;">
+        <div class="card">
+          <div class="card-heading">
+            <div>
+              <div class="card-title">Capaian per Pilar Paripurna</div>
+              <div class="card-subtitle">Rata-rata cakupan 6 pilar pembinaan (%)</div>
+            </div>
+          </div>
+          <div class="chart-wrap chart-h-300">
+            <canvas id="radarChart" role="img" aria-label="Radar chart capaian rata-rata 6 pilar IKM Paripurna"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-heading">
+            <div>
+              <div class="card-title">Sebaran Status</div>
+              <div class="card-subtitle">Total populasi IKM</div>
+            </div>
+          </div>
+          <div class="chart-wrap chart-h-220">
+            <canvas id="donutChart" role="img" aria-label="Donut chart sebaran status Paripurna"></canvas>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px; font-size: 12px;">
+            <div style="display: flex; justify-content: space-between;"><span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;background:var(--teal-400);border-radius:2px;"></span>Paripurna</span><span id="leg-par" style="font-weight:600;">—</span></div>
+            <div style="display: flex; justify-content: space-between;"><span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;background:var(--amber-400);border-radius:2px;"></span>Proses Pembinaan</span><span id="leg-pros" style="font-weight:600;">—</span></div>
+            <div style="display: flex; justify-content: space-between;"><span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;background:var(--red-400);border-radius:2px;"></span>Belum Terbina</span><span id="leg-bel" style="font-weight:600;">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-split" style="margin-bottom: 16px;">
+        <div class="card">
+          <div class="card-heading">
+            <div>
+              <div class="card-title">Peringkat Kabupaten/Kota</div>
+              <div class="card-subtitle">Jumlah IKM Paripurna (10 teratas)</div>
+            </div>
+          </div>
+          <div class="chart-wrap chart-h-340">
+            <canvas id="kabkotaChart" role="img" aria-label="Bar chart IKM Paripurna per kabupaten/kota"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-heading">
+            <div>
+              <div class="card-title">Aktivitas Terbaru</div>
+              <div class="card-subtitle">Pembinaan 14 hari terakhir</div>
+            </div>
+          </div>
+          <div id="recentActivity" style="max-height: 340px; overflow-y: auto;"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-heading">
+          <div>
+            <div class="card-title">Trend Pembinaan Kuartal Berjalan</div>
+            <div class="card-subtitle">Jumlah kegiatan per pilar per bulan</div>
+          </div>
+        </div>
+        <div class="chart-wrap chart-h-260">
+          <canvas id="trendChart" role="img" aria-label="Line chart trend pembinaan per pilar per bulan"></canvas>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top: 16px;">
+        <div class="card-heading">
+          <div>
+            <div class="card-title">Ringkasan Koordinasi Tupoksi</div>
+            <div class="card-subtitle">Peran 6 Bidang & 14 UPT dalam pembinaan bulan ini</div>
+          </div>
+          <button class="btn" onclick="goTo('tupoksi')">
+            Lihat Detail
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+        <div class="grid-2" style="gap: 24px;">
+          <div>
+            <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 12px;">Kegiatan per Bidang</div>
+            <div id="dashBidangList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
+          <div>
+            <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 12px;">UPT Paling Aktif</div>
+            <div id="dashUPTList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-profil">
+      <div class="page-header">
+        <div>
+          <div class="page-eyebrow">Modul 1</div>
+          <h1 class="page-title">Profil IKM</h1>
+          <p class="page-subtitle">Database lengkap seluruh IKM binaan Disperindag Jatim dengan status capaian 6 pilar Paripurna.</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn" onclick="goTo('upload')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Tambah IKM
+          </button>
+          <button class="btn btn-primary" onclick="exportCSV()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-filters">
+          <input type="text" class="input" id="searchInput" placeholder="🔍  Cari nama IKM, pemilik, atau ID..." />
+          <select class="select" id="filterKabkota">
+            <option value="">Semua Kab/Kota</option>
+          </select>
+          <select class="select" id="filterSektor">
+            <option value="">Semua Sektor</option>
+          </select>
+          <select class="select" id="filterBidang">
+            <option value="">Semua Bidang</option>
+          </select>
+          <select class="select" id="filterStatus">
+            <option value="">Semua Status</option>
+            <option value="Paripurna">Paripurna</option>
+            <option value="Proses">Dalam Pembinaan</option>
+            <option value="Belum">Belum Terbina</option>
+          </select>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>IKM</th>
+              <th>No. Telp</th>
+              <th>Kab/Kota</th>
+              <th>Sektor</th>
+              <th>Bidang Pembina Utama</th>
+              <th>Capaian</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="ikmTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="page" id="page-pembinaan">
+      <div class="page-header">
+        <div>
+          <div class="page-eyebrow">Modul 2</div>
+          <h1 class="page-title">Riwayat Pembinaan</h1>
+          <p class="page-subtitle">Catat dan lacak seluruh kegiatan pembinaan, pelatihan, dan pendampingan yang telah diberikan kepada IKM.</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-coral" onclick="addKegiatanDemo()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Input Kegiatan
+          </button>
+        </div>
+      </div>
+
+      <div class="module-intro">
+        <h3>Pembinaan Terintegrasi</h3>
+        <p>Setiap kegiatan pembinaan tercatat lengkap: jenis pelatihan, pilar Paripurna yang ditarget, IKM peserta, tanggal, dan output. Data otomatis memperbarui status capaian IKM di modul Profil.</p>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 16px;">
+        <div class="kpi-card">
+          <div class="kpi-label">Total Kegiatan 2026</div>
+          <div class="kpi-value" id="kpi-keg-total">—</div>
+          <div class="kpi-delta">Tersebar di 6 pilar</div>
+        </div>
+        <div class="kpi-card coral">
+          <div class="kpi-label">IKM Peserta Unik</div>
+          <div class="kpi-value" id="kpi-keg-ikm">—</div>
+          <div class="kpi-delta">Dari total IKM aktif</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-heading">
+          <div>
+            <div class="card-title">Timeline Pembinaan</div>
+            <div class="card-subtitle">Urutan kronologis kegiatan terbaru</div>
+          </div>
+          <select class="select" id="filterPembinaan" style="min-width: 180px;">
+            <option value="">Semua Pilar</option>
+            <option value="Legalitas">Legalitas</option>
+            <option value="Produksi">Produksi &amp; Mutu</option>
+            <option value="SDM">SDM &amp; Manajemen</option>
+            <option value="Pemasaran">Pemasaran &amp; Branding</option>
+            <option value="Pembiayaan">Pembiayaan</option>
+            <option value="Kemitraan">Kemitraan</option>
+          </select>
+        </div>
+        <div class="timeline" id="timelineContainer"></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-pelayanan">
+      <div class="page-header">
+        <div>
+          <div class="page-eyebrow">Modul 3</div>
+          <h1 class="page-title">Pelayanan IKM</h1>
+          <p class="page-subtitle">Layanan yang tersedia untuk IKM — fasilitasi sertifikasi, konsultasi, kurasi produk, dan lainnya.</p>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 16px;">
+        <div class="card">
+          <div class="card-heading">
+            <div>
+              <div class="card-title">Layanan Aktif</div>
+              <div class="card-subtitle">Per jenis pelayanan</div>
+            </div>
+          </div>
+          <div id="layananList" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-heading">
+            <div>
+              <div class="card-title">Volume Pelayanan</div>
+              <div class="card-subtitle">Jumlah permohonan per jenis</div>
+            </div>
+          </div>
+          <div class="chart-wrap chart-h-300">
+            <canvas id="layananChart" role="img" aria-label="Bar chart volume pelayanan"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-analitik">
+      <div class="page-header">
+        <div>
+          <div class="page-eyebrow">Modul 4</div>
+          <h1 class="page-title">Analitik Paripurna</h1>
+          <p class="page-subtitle">Gap analysis dan rekomendasi strategis — identifikasi IKM dan pilar mana yang butuh prioritas pembinaan.</p>
+        </div>
+      </div>
+
+      <div class="module-intro">
+        <h3>Heatmap Capaian IKM × Pilar</h3>
+        <p>Visualisasi matriks capaian setiap IKM pada 6 pilar. Semakin hijau = semakin paripurna. Sel merah = pilar yang butuh intervensi prioritas.</p>
+      </div>
+
+      <div class="card" style="margin-bottom: 16px;">
+        <div class="card-heading">
+          <div>
+            <div class="card-title">Matriks Capaian 6 Pilar</div>
+            <div class="card-subtitle">15 IKM dengan capaian tertinggi</div>
+          </div>
+        </div>
+        <div id="heatmapContainer"></div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 16px;">
+        <div class="card">
+          <div class="card-heading">
+            <div>
+              <div class="card-title">Gap Analysis per Pilar</div>
+              <div class="card-subtitle">Rata-rata capaian populasi IKM</div>
+            </div>
+          </div>
+          <div class="chart-wrap chart-h-260">
+            <canvas id="gapChart" role="img" aria-label="Bar chart gap analysis per pilar"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-heading">
+            <div>
+              <div class="card-title">Rekomendasi Strategis</div>
+              <div class="card-subtitle">Generated by SIMPIKM analytics</div>
+            </div>
+          </div>
+          <div class="rec-list" id="rekomendasiList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-tupoksi">
+      <div class="page-header">
+        <div>
+          <div class="page-eyebrow">Modul 5 · Inti SIMPIKM</div>
+          <h1 class="page-title">Koordinasi Tupoksi</h1>
+          <p class="page-subtitle">Pembagian peran yang jelas antara 6 Bidang dan 14 UPT dalam pembinaan IKM Paripurna — menghindari tumpang-tindih, menutup gap, memastikan semua IKM terbina di setiap tahapan rantai nilai.</p>
+        </div>
+      </div>
+
+      <div class="module-intro" style="border-left-color: var(--teal-600);">
+        <h3>Mengapa Koordinasi Tupoksi Jadi Kunci SIMPIKM?</h3>
+        <p>Tanpa pembagian peran yang jelas, pembinaan IKM sering terjadi tumpang-tindih (2 bidang mengerjakan IKM yang sama) atau gap (tidak ada yang menangani aspek tertentu). SIMPIKM memetakan setiap pilar Paripurna ke Bidang penanggung jawab utama, dengan UPT sebagai unit teknis pelaksana. Setiap kegiatan pembinaan otomatis tercatat di bawah akuntabilitas yang benar.</p>
+      </div>
+
+      <div class="card" style="margin-bottom: 16px; padding: 0;">
+        <div class="org-dinas-header">
+          <div class="org-dinas-tag">Provinsi Jawa Timur</div>
+          <div class="org-dinas-name">Dinas Perindustrian dan Perdagangan</div>
+        </div>
+        <div style="padding: 28px 22px;">
+          <div style="text-align: center; font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700; margin-bottom: 14px;">6 Bidang / Sekretariat Pembinaan</div>
+          <div class="bidang-grid" id="bidangGrid"></div>
+
+          <div style="text-align: center; font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700; margin: 28px 0 14px;">14 Unit Pelaksana Teknis (UPT)</div>
+          <div class="upt-grid" id="uptGrid"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: 16px;">
+        <div class="card-heading">
+          <div>
+            <div class="card-title">Matriks Tupoksi: Pilar Paripurna × Bidang</div>
+            <div class="card-subtitle">Siapa bertanggung jawab atas apa — mencegah tumpang-tindih pembinaan</div>
+          </div>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="raci-matrix" id="raciTable"></table>
+        </div>
+        <div class="raci-legend">
+          <div class="raci-legend-item"><span class="raci-cell raci-A">A</span> Accountable — penanggung jawab utama</div>
+          <div class="raci-legend-item"><span class="raci-cell raci-R">R</span> Responsible — eksekutor utama</div>
+          <div class="raci-legend-item"><span class="raci-cell raci-S">S</span> Supporting — pendukung</div>
+          <div class="raci-legend-item"><span class="raci-cell raci-C">C</span> Consulted — dikonsultasi</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 16px;">
+        <div class="card">
+          <div class="card-heading">
+            <div>
+              <div class="card-title">Beban Kerja per Bidang</div>
+              <div class="card-subtitle">Jumlah kegiatan pembinaan yang diinisiasi</div>
+            </div>
+          </div>
+          <div class="chart-wrap chart-h-300">
+            <canvas id="bidangWorkloadChart" role="img" aria-label="Bar chart beban kerja per bidang"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-heading">
+            <div>
+              <div class="card-title">Kontribusi UPT</div>
+              <div class="card-subtitle">Kegiatan yang dilaksanakan (top 8 UPT aktif)</div>
+            </div>
+          </div>
+          <div class="chart-wrap chart-h-300">
+            <canvas id="uptContribChart" role="img" aria-label="Bar chart kontribusi UPT"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-heading">
+          <div>
+            <div class="card-title">Early Warning: Overlap &amp; Gap</div>
+            <div class="card-subtitle">Deteksi dini tumpang-tindih atau kekosongan tupoksi</div>
+          </div>
+        </div>
+        <div class="rec-list" id="coordWarnings"></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-upload">
+      <div class="page-header">
+        <div>
+          <div class="page-eyebrow">Data Management</div>
+          <h1 class="page-title">Upload Data IKM</h1>
+          <p class="page-subtitle">Import data IKM dari file CSV. Sistem akan memvalidasi dan otomatis menghitung capaian 6 pilar Paripurna.</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn" onclick="downloadTemplate()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Download Template
+          </button>
+          <button class="btn" onclick="resetDataDefault()" style="color: var(--coral-600); border-color: var(--coral-100);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+            Reset ke Data Awal
+          </button>
+        </div>
+      </div>
+
+      <div class="module-intro">
+        <h3>Format CSV</h3>
+        <p>File harus mengandung kolom: <span class="font-mono" style="background: var(--cream); padding: 2px 6px; border-radius: 4px;">nama, no_telp, pemilik, kabkota, sektor, pegawai, omset_jt, legalitas, produksi, sdm, pemasaran, pembiayaan, kemitraan</span>. Nilai pilar 0-100.</p>
+      </div>
+
+      <!-- SELECTOR BIDANG / UPT -->
+      <div class="card" style="margin-bottom: 16px; border-left: 4px solid var(--teal-600);">
+        <div class="card-heading" style="margin-bottom: 14px;">
+          <div>
+            <div class="card-title">Identitas Pengunggah</div>
+            <div class="card-subtitle">Pilih Bidang atau UPT yang melakukan upload data ini — akan otomatis dicatat di setiap IKM yang masuk</div>
+          </div>
+          <div style="background: var(--teal-50); color: var(--teal-800); font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 20px; letter-spacing: 0.06em; white-space: nowrap;">WAJIB DIISI</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: end;">
+          <div>
+            <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); margin-bottom: 8px;">Bidang Penanggung Jawab</label>
+            <select class="select" id="uploadBidangSelect" style="width: 100%;" onchange="syncUptToEmpty()">
+              <option value="">— Pilih Bidang —</option>
+              <option value="BID-1">BID-1 · Bidang Pembangunan SDI</option>
+              <option value="BID-2">BID-2 · Bidang Pemberdayaan Industri</option>
+              <option value="BID-3">BID-3 · Bidang Sarpras &amp; Wasdal</option>
+              <option value="BID-4">BID-4 · Bidang Perdagangan DN</option>
+              <option value="BID-5">BID-5 · Bidang Perdagangan LN</option>
+              <option value="BID-6">BID-6 · Sekretariat</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); margin-bottom: 8px;">UPT Pelaksana <span style="font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--ink-soft); font-size: 10px;">(opsional jika ada)</span></label>
+            <select class="select" id="uploadUptSelect" style="width: 100%;" onchange="syncBidangFromUpt()">
+              <option value="">— Pilih UPT (opsional) —</option>
+              <option value="UPT-01">UPT-01 · Industri Logam &amp; Perekayasaan (Sidoarjo)</option>
+              <option value="UPT-02">UPT-02 · Industri Kulit (Magetan)</option>
+              <option value="UPT-03">UPT-03 · Industri Kerajinan &amp; Kayu (Pasuruan)</option>
+              <option value="UPT-04">UPT-04 · Industri Makanan, Minuman &amp; Kemasan (SBY)</option>
+              <option value="UPT-05">UPT-05 · Aneka Industri (Surabaya)</option>
+              <option value="UPT-06">UPT-06 · Pengujian &amp; Sertifikasi Mutu Barang (SBY)</option>
+              <option value="UPT-07">UPT-07 · Pelatihan &amp; Pengembangan Industri (SBY)</option>
+              <option value="UPT-08">UPT-08 · Perlindungan Konsumen SBY</option>
+              <option value="UPT-09">UPT-09 · Perlindungan Konsumen MLG</option>
+              <option value="UPT-10">UPT-10 · Perlindungan Konsumen KDR</option>
+              <option value="UPT-11">UPT-11 · Perlindungan Konsumen JBR</option>
+              <option value="UPT-12">UPT-12 · Perlindungan Konsumen BJN</option>
+              <option value="UPT-13">UPT-13 · Pengembangan Mutu Produk Industri (SBY)</option>
+              <option value="UPT-14">UPT-14 · Pasar Lelang Agro (Sidoarjo)</option>
+            </select>
+          </div>
+        </div>
+        <div id="uploaderBadge" style="display:none; margin-top: 12px; background: var(--teal-50); border: 1px solid var(--teal-100); border-radius: 8px; padding: 10px 14px; font-size: 12px; font-weight: 600; color: var(--teal-900);">
+          ✓ Data akan ditandai sebagai upload dari: <span id="uploaderBadgeText">—</span>
+        </div>
+      </div>
+
+      <div id="storageStatusBanner" style="background: var(--teal-50); border: 1px solid var(--teal-100); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 14px;">
+        <div style="width: 36px; height: 36px; background: var(--teal-600); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; flex-shrink: 0;">💾</div>
+        <div style="flex: 1;">
+          <div style="font-weight: 700; font-size: 13px; color: var(--teal-900);">Penyimpanan Lokal Browser Aktif</div>
+          <div style="font-size: 12px; color: var(--teal-800); margin-top: 2px;" id="storageStatusText">Data otomatis tersimpan di browser ini. Aman dari refresh & tutup tab.</div>
+        </div>
+        <div style="text-align: right; flex-shrink: 0;">
+          <div style="font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600; color: var(--teal-800);" id="storageKBDisplay">—</div>
+          <div style="font-size: 10px; color: var(--teal-600); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">KB tersimpan</div>
+        </div>
+      </div>
+
+      <label for="csvInput" class="upload-zone" id="uploadZone">
+        <div class="upload-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div style="font-family: 'Fraunces', serif; font-size: 18px; font-weight: 500; margin-bottom: 4px; color: var(--ink);">Drop file CSV di sini</div>
+        <div style="font-size: 12px; color: var(--ink-muted);">atau klik untuk pilih file — maks 5MB</div>
+        <input type="file" id="csvInput" accept=".csv" style="display:none;" />
+      </label>
+
+      <div id="uploadPreview" style="display:none; margin-top:16px;">
+        <div class="card">
+          <div class="card-heading">
+            <div>
+              <div class="card-title">Preview Data</div>
+              <div class="card-subtitle" id="previewSubtitle">—</div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn" onclick="cancelUpload()">Batal</button>
+              <button class="btn btn-primary" onclick="confirmUpload()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                Simpan ke SIMPIKM
+              </button>
+            </div>
+          </div>
+          <div style="max-height:400px; overflow:auto; border:1px solid var(--line); border-radius:10px;">
+            <table>
+              <thead id="previewHead"></thead>
+              <tbody id="previewBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-tentang">
+      <div class="page-header">
+        <div>
+          <div class="page-eyebrow">Konsep Dasar</div>
+          <h1 class="page-title">Tentang IKM Paripurna</h1>
+          <p class="page-subtitle">Kerangka pembinaan IKM secara holistik dari penyediaan bahan baku, proses pengolahan, penciptaan produk jadi, hingga akses pemasaran luas.</p>
+        </div>
+      </div>
+
+      <div class="module-intro" style="border-left-color: var(--teal-600);">
+        <h3>Apa itu IKM Paripurna?</h3>
+        <p>IKM Paripurna adalah kerangka pembinaan IKM secara holistik yang bergerak dari hulu ke hilir. Sebuah IKM dianggap "paripurna" ketika telah melewati tahapan rantai nilai secara utuh dan mencapai standar minimum pada <strong>6 pilar pembinaan</strong> secara bersamaan. Pendekatan ini memastikan pembinaan menghasilkan IKM yang benar-benar siap bersaing di pasar nasional maupun global.</p>
+      </div>
+
+      <div class="module-intro" style="border-left-color: var(--coral-400);">
+        <h3>4 Tahap Rantai Nilai Pembinaan (End-to-End)</h3>
+        <ul style="margin-top: 8px; margin-left: 20px; font-size: 13px; color: var(--ink-muted); display: flex; flex-direction: column; gap: 6px;">
+          <li><strong>Tahap 1 — Bahan Baku:</strong> Akses bahan baku, peningkatan kapasitas teknologi (melalui 5 UPT Industri), dan bimbingan standardisasi. <br><em style="color:var(--ink-soft);">Penanggung jawab: Bidang Pembangunan Sumber Daya Industri & UPT terkait.</em></li>
+          <li><strong>Tahap 2 — Pengolahan:</strong> Pelayanan teknis, pendampingan, dan peningkatan kapasitas SDM baik teknis maupun manajerial. <br><em style="color:var(--ink-soft);">Penanggung jawab: Bidang Pemberdayaan Industri.</em></li>
+          <li><strong>Tahap 3 — Produk Jadi:</strong> Peningkatan nilai saing melalui perlindungan HKI, sertifikasi mutu (Halal, SNI, dll), packaging, dan barcode. <br><em style="color:var(--ink-soft);">Penanggung jawab: Bidang Sarpras & Wasdal, UPT PMPI, UPT PSMB.</em></li>
+          <li><strong>Tahap 4 — Pemasaran:</strong> Akses pasar hilir melalui e-commerce, promosi mancanegara, temu bisnis, dan ekspor. <br><em style="color:var(--ink-soft);">Penanggung jawab: Bidang Perdagangan DN & LN, 5 UPT Perlindungan Konsumen.</em></li>
+        </ul>
+      </div>
+
+      <div class="module-intro" style="border-left-color: var(--amber-400); margin-bottom: 20px;">
+        <h3>Peran Sistem SIMPIKM</h3>
+        <p>Program pembinaan ini melibatkan minimal 6 Bidang dan 14 UPT pada tahapan yang berbeda-beda. SIMPIKM bertindak sebagai <strong>"perekat digital"</strong> yang mengintegrasikan data dari seluruh proses ini. Melalui Modul Profil, Riwayat Pembinaan, Layanan, dan Analitik, SIMPIKM memastikan tidak ada data yang silo, mencegah tumpang tindih program, dan memetakan capaian pembinaan secara terpusat.</p>
+      </div>
+
+      <h3 style="font-family: 'Fraunces', serif; font-size: 18px; font-weight: 500; color: var(--ink); margin-bottom: 14px;">6 Pilar Paripurna</h3>
+      <div class="pilar-grid" style="grid-template-columns: repeat(2, 1fr); gap: 14px;" id="pilarInfoContainer"></div>
+    </div>
+
+  </main>
+</div>
+
+<div class="modal-bg" id="ikmModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div style="font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 4px;" id="modalId">—</div>
+        <div class="font-display" style="font-size: 22px; font-weight: 500; color: var(--ink);" id="modalNama">—</div>
+        <div style="font-size: 13px; color: var(--ink-muted); margin-top: 4px;" id="modalPemilik">—</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+
+    <div class="ikm-meta-grid">
+      <div><div class="meta-label">Kab/Kota</div><div class="meta-value" id="modalKabkota">—</div></div>
+      <div><div class="meta-label">Sektor</div><div class="meta-value" id="modalSektor">—</div></div>
+      <div><div class="meta-label">No. Telp</div><div class="meta-value" id="modalNoTelp">—</div></div>
+      <div><div class="meta-label">Pegawai</div><div class="meta-value" id="modalPegawai">—</div></div>
+      <div><div class="meta-label">Omset / Thn</div><div class="meta-value" id="modalOmset">—</div></div>
+    </div>
+
+    <div style="background: var(--teal-50); border-radius: 10px; padding: 14px 16px; margin-bottom: 18px; display: flex; gap: 20px; align-items: center;">
+      <div style="flex: 1;">
+        <div class="meta-label" style="color: var(--teal-800);">Bidang Pembina Utama</div>
+        <div style="font-family: 'Fraunces', serif; font-size: 15px; font-weight: 600; color: var(--teal-900); margin-top: 2px;" id="modalBidang">—</div>
+      </div>
+      <div style="width: 1px; height: 32px; background: var(--teal-100);"></div>
+      <div style="flex: 1.5;">
+        <div class="meta-label" style="color: var(--teal-800);">UPT Pelaksana Yang Terlibat</div>
+        <div style="font-size: 12px; color: var(--ink); margin-top: 4px; line-height: 1.45;" id="modalUPT">—</div>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+      <div>
+        <div style="font-family: 'Fraunces', serif; font-size: 17px; font-weight: 500; color: var(--ink);">Capaian 6 Pilar Paripurna</div>
+        <div style="font-size: 12px; color: var(--ink-soft);">Status: <span id="modalStatus">—</span> &nbsp;·&nbsp; Rata-rata: <span id="modalAvg" style="font-weight: 600;">—</span></div>
+      </div>
+    </div>
+
+    <div class="pilar-grid" id="modalPilar"></div>
+
+    <div style="margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line-soft);">
+      <div class="card-title" style="font-size: 15px; margin-bottom: 12px;">Riwayat Pembinaan</div>
+      <div id="modalRiwayat" style="font-size: 13px; color: var(--ink-muted);"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="toast-icon">✓</span>
+  <span id="toastMsg">—</span>
+</div>
+
+<script>
+/* ============================================================
+   SIMPIKM — Data & Application Logic
+   ============================================================ */
+
+// ------- 6 PILAR DEFINITION -------
+const PILAR = [
+  { key: 'legalitas', label: 'Legalitas', full: 'Legalitas Usaha', desc: 'NIB, PIRT, Sertifikat Halal, HAKI/Merk — fondasi legal agar IKM dapat beroperasi dan dipercaya pasar.', items: ['NIB', 'PIRT', 'Halal', 'HAKI'], color: 'teal', icon: '⚖' },
+  { key: 'produksi', label: 'Produksi & Mutu', full: 'Teknologi Produksi & Mutu', desc: 'GMP/CPPOB, SNI, standardisasi proses, pengujian mutu — menjamin produk memenuhi standar industri.', items: ['GMP', 'SNI', 'Pengujian Mutu', 'Mesin Modern'], color: 'coral', icon: '⚙' },
+  { key: 'sdm', label: 'SDM & Manajemen', full: 'SDM & Manajemen Usaha', desc: 'Pelatihan teknis, pelatihan manajerial, sertifikasi kompetensi — membangun kapasitas internal IKM.', items: ['Pelatihan Teknis', 'Manajerial', 'Sertifikasi'], color: 'amber', icon: '👥' },
+  { key: 'pemasaran', label: 'Pemasaran & Branding', full: 'Pemasaran & Branding', desc: 'Branding, packaging, digital marketing, masuk e-commerce — membuka akses ke pasar yang lebih luas.', items: ['Branding', 'Packaging', 'Digital Marketing', 'E-commerce'], color: 'teal', icon: '📢' },
+  { key: 'pembiayaan', label: 'Pembiayaan', full: 'Akses Pembiayaan', desc: 'Akses KUR perbankan, LPDB, koperasi, investor — menyediakan modal untuk ekspansi.', items: ['KUR/Bank', 'LPDB/Koperasi'], color: 'coral', icon: '$' },
+  { key: 'kemitraan', label: 'Kemitraan', full: 'Kemitraan & Jejaring', desc: 'Kemitraan B2B, supply chain, kerjasama dengan industri besar — membangun ekosistem usaha.', items: ['B2B', 'Supply Chain', 'Industri Besar'], color: 'amber', icon: '🤝' }
+];
+
+// ------- 6 BIDANG DISPERINDAG JATIM (DISESUAIKAN DENGAN RANTAI NILAI) -------
+const BIDANG = [
+  { kode: 'BID-1', nama: 'Bidang Pembangunan Sumber Daya Industri', singkat: 'Pembangunan SDI', fokus: 'Akses bahan baku, peningkatan kapasitas teknologi, dan standardisasi (Tahap 1: Bahan Baku)', warna: 'teal', sektorFokus: ['Logam & Mesin', 'Kerajinan'] },
+  { kode: 'BID-2', nama: 'Bidang Pemberdayaan Industri', singkat: 'Pemberdayaan', fokus: 'Pelayanan teknis, pendampingan, dan peningkatan kapasitas SDM (Tahap 2: Pengolahan)', warna: 'coral', sektorFokus: ['Makanan & Minuman', 'Tekstil & Fashion', 'Kulit & Alas Kaki'] },
+  { kode: 'BID-3', nama: 'Bidang Sarana Prasarana, Pengawasan dan Pengendalian Industri', singkat: 'Sarpras & Wasdal', fokus: 'Perlindungan HKI, sertifikasi mutu, pengawasan, dan SNI (Tahap 3: Produk Jadi)', warna: 'amber', sektorFokus: [] },
+  { kode: 'BID-4', nama: 'Bidang Pengembangan Perdagangan Dalam Negeri', singkat: 'Perdagangan DN', fokus: 'Pemasaran e-commerce, kurasi produk, promosi domestik (Tahap 4: Pemasaran)', warna: 'teal', sektorFokus: [] },
+  { kode: 'BID-5', nama: 'Bidang Pengembangan Perdagangan Luar Negeri', singkat: 'Perdagangan LN', fokus: 'Fasilitasi ekspor, business matching mancanegara, promosi LN (Tahap 4: Pemasaran)', warna: 'coral', sektorFokus: [] },
+  { kode: 'BID-6', nama: 'Sekretariat', singkat: 'Sekretariat', fokus: 'Koordinasi lintas-bidang, pelaporan terpadu, dan manajemen sistem informasi', warna: 'amber', sektorFokus: [] }
+];
+
+// ------- 14 UPT DISPERINDAG JATIM (DISESUAIKAN DENGAN STRUKTUR AKTUAL) -------
+const UPT = [
+  { kode: 'UPT-01', nama: 'UPT Industri Logam & Perekayasaan', lokasi: 'Sidoarjo', bidangInduk: 'BID-1', spesialisasi: 'Logam & Mesin', pilarUtama: ['produksi'] },
+  { kode: 'UPT-02', nama: 'UPT Industri Kulit', lokasi: 'Magetan', bidangInduk: 'BID-1', spesialisasi: 'Kulit & Alas Kaki', pilarUtama: ['produksi'] },
+  { kode: 'UPT-03', nama: 'UPT Industri Kerajinan & Kayu', lokasi: 'Pasuruan', bidangInduk: 'BID-1', spesialisasi: 'Kerajinan', pilarUtama: ['produksi', 'sdm'] },
+  { kode: 'UPT-04', nama: 'UPT Industri Makanan, Minuman & Kemasan', lokasi: 'Surabaya', bidangInduk: 'BID-1', spesialisasi: 'Makanan & Minuman', pilarUtama: ['produksi'] },
+  { kode: 'UPT-05', nama: 'UPT Aneka Industri', lokasi: 'Surabaya', bidangInduk: 'BID-1', spesialisasi: 'Multisektor', pilarUtama: ['produksi', 'sdm'] },
+  { kode: 'UPT-06', nama: 'UPT Pengujian & Sertifikasi Mutu Barang', lokasi: 'Surabaya', bidangInduk: 'BID-3', spesialisasi: 'Sertifikasi', pilarUtama: ['legalitas', 'produksi'] },
+  { kode: 'UPT-07', nama: 'UPT Pelatihan & Pengembangan Industri', lokasi: 'Surabaya', bidangInduk: 'BID-2', spesialisasi: 'SDM', pilarUtama: ['sdm'] },
+  { kode: 'UPT-08', nama: 'UPT Perlindungan Konsumen SBY', lokasi: 'Surabaya', bidangInduk: 'BID-4', spesialisasi: 'Pengawasan', pilarUtama: ['pemasaran'] },
+  { kode: 'UPT-09', nama: 'UPT Perlindungan Konsumen MLG', lokasi: 'Malang', bidangInduk: 'BID-4', spesialisasi: 'Pengawasan', pilarUtama: ['pemasaran'] },
+  { kode: 'UPT-10', nama: 'UPT Perlindungan Konsumen KDR', lokasi: 'Kediri', bidangInduk: 'BID-4', spesialisasi: 'Pengawasan', pilarUtama: ['pemasaran'] },
+  { kode: 'UPT-11', nama: 'UPT Perlindungan Konsumen JBR', lokasi: 'Jember', bidangInduk: 'BID-4', spesialisasi: 'Pengawasan', pilarUtama: ['pemasaran'] },
+  { kode: 'UPT-12', nama: 'UPT Perlindungan Konsumen BJN', lokasi: 'Bojonegoro', bidangInduk: 'BID-4', spesialisasi: 'Pengawasan', pilarUtama: ['pemasaran'] },
+  { kode: 'UPT-13', nama: 'UPT Pengembangan Mutu Produk Industri', lokasi: 'Surabaya', bidangInduk: 'BID-3', spesialisasi: 'HKI & Desain', pilarUtama: ['legalitas', 'produksi'] },
+  { kode: 'UPT-14', nama: 'UPT Pasar Lelang Agro', lokasi: 'Sidoarjo', bidangInduk: 'BID-4', spesialisasi: 'Pemasaran', pilarUtama: ['pemasaran', 'kemitraan'] }
+];
+
+// ------- MATRIKS TUPOKSI: PILAR × BIDANG -------
+// R = Responsible (eksekusi), A = Accountable (penanggung jawab utama), S = Supporting, C = Consulted
+const TUPOKSI_MATRIX = {
+  'legalitas':   { 'BID-1': 'S', 'BID-2': 'S', 'BID-3': 'A', 'BID-4': '-',  'BID-5': '-',  'BID-6': 'C' },
+  'produksi':    { 'BID-1': 'A', 'BID-2': 'A', 'BID-3': 'S', 'BID-4': '-',  'BID-5': '-',  'BID-6': '-' },
+  'sdm':         { 'BID-1': 'S', 'BID-2': 'A', 'BID-3': 'C', 'BID-4': 'S',  'BID-5': 'S', 'BID-6': '-' },
+  'pemasaran':   { 'BID-1': '-',  'BID-2': 'S', 'BID-3': 'C', 'BID-4': 'A',  'BID-5': 'A', 'BID-6': '-' },
+  'pembiayaan':  { 'BID-1': 'C', 'BID-2': 'A', 'BID-3': '-',  'BID-4': 'S',  'BID-5': 'S', 'BID-6': 'S' },
+  'kemitraan':   { 'BID-1': 'A', 'BID-2': 'S', 'BID-3': '-',  'BID-4': 'S',  'BID-5': 'A', 'BID-6': '-' }
+};
+
+// Assign bidangPembina otomatis berdasarkan sektor
+function getBidangForSektor(sektor) {
+  const b = BIDANG.find(b => b.sektorFokus.includes(sektor));
+  return b ? b.kode : 'BID-2'; // Default ke Pemberdayaan jika tidak spesifik
+}
+
+// ------- DUMMY DATA: 24 IKM JATIM -------
+let ikmData = [
+  { id: 'IKM-2026-001', nama: 'UD Maharani Batik', no_telp: '0352-461-234', pemilik: 'Ibu Maharani Sari', kabkota: 'Ponorogo', sektor: 'Tekstil & Fashion', pegawai: 12, omset_jt: 180, legalitas: 100, produksi: 95, sdm: 85, pemasaran: 90, pembiayaan: 80, kemitraan: 80, bidang_upload: 'BID-2', lastPembinaan: '2026-10-08' },
+  { id: 'IKM-2026-002', nama: 'CV Rasa Jatim Sejahtera', no_telp: '0812-3456-7890', pemilik: 'Bapak Supriadi', kabkota: 'Sidoarjo', sektor: 'Makanan & Minuman', pegawai: 18, omset_jt: 240, legalitas: 100, produksi: 90, sdm: 85, pemasaran: 85, pembiayaan: 90, kemitraan: 80, bidang_upload: 'BID-2', lastPembinaan: '2026-10-12' },
+  { id: 'IKM-2026-003', nama: 'Kopi Gunung Arjuno', no_telp: '0856-7890-1234', pemilik: 'Bapak Hendra Wijaya', kabkota: 'Malang', sektor: 'Makanan & Minuman', pegawai: 8, omset_jt: 140, legalitas: 90, produksi: 85, sdm: 70, pemasaran: 85, pembiayaan: 60, kemitraan: 55, bidang_upload: 'BID-4', lastPembinaan: '2026-10-15' },
+  { id: 'IKM-2026-004', nama: 'PT Sumber Rejeki Logam', no_telp: '031-7654-321', pemilik: 'Bapak Tri Santoso', kabkota: 'Surabaya', sektor: 'Logam & Mesin', pegawai: 25, omset_jt: 420, legalitas: 95, produksi: 90, sdm: 80, pemasaran: 60, pembiayaan: 85, kemitraan: 70, bidang_upload: 'BID-1', lastPembinaan: '2026-10-05' },
+  { id: 'IKM-2026-005', nama: 'Kerajinan Bambu Lestari', no_telp: '0821-5678-9012', pemilik: 'Ibu Siti Aminah', kabkota: 'Banyuwangi', sektor: 'Kerajinan', pegawai: 6, omset_jt: 85, legalitas: 70, produksi: 60, sdm: 55, pemasaran: 50, pembiayaan: 30, kemitraan: 40, bidang_upload: 'BID-2', lastPembinaan: '2026-09-28' },
+  { id: 'IKM-2026-006', nama: 'Tempe Sehat Pak Narto', no_telp: '0354-212-345', pemilik: 'Bapak Narto Hadi', kabkota: 'Kediri', sektor: 'Makanan & Minuman', pegawai: 4, omset_jt: 48, legalitas: 50, produksi: 35, sdm: 30, pemasaran: 20, pembiayaan: 15, kemitraan: 20, bidang_upload: 'BID-2', lastPembinaan: '2026-09-20' },
+  { id: 'IKM-2026-007', nama: 'Rotan Wicaksana Craft', no_telp: '0878-9012-3456', pemilik: 'Bapak Wicaksana', kabkota: 'Gresik', sektor: 'Kerajinan', pegawai: 10, omset_jt: 130, legalitas: 85, produksi: 75, sdm: 70, pemasaran: 75, pembiayaan: 50, kemitraan: 60, bidang_upload: 'BID-1', lastPembinaan: '2026-10-02' },
+  { id: 'IKM-2026-008', nama: 'Sepatu Kulit Raja Magetan', no_telp: '0351-895-678', pemilik: 'Bapak Ahmad Fauzi', kabkota: 'Magetan', sektor: 'Kulit & Alas Kaki', pegawai: 14, omset_jt: 195, legalitas: 100, produksi: 95, sdm: 90, pemasaran: 85, pembiayaan: 85, kemitraan: 85, bidang_upload: 'BID-1|UPT-02', lastPembinaan: '2026-10-14' },
+  { id: 'IKM-2026-009', nama: 'Batik Tulis Tanjung Bumi', no_telp: '0813-4567-8901', pemilik: 'Ibu Hartini', kabkota: 'Pamekasan', sektor: 'Tekstil & Fashion', pegawai: 7, omset_jt: 95, legalitas: 70, produksi: 65, sdm: 60, pemasaran: 55, pembiayaan: 40, kemitraan: 45, bidang_upload: 'BID-2', lastPembinaan: '2026-09-25' },
+  { id: 'IKM-2026-010', nama: 'Keripik Tempe Sanan', no_telp: '0341-567-890', pemilik: 'Bapak Joko Susanto', kabkota: 'Malang', sektor: 'Makanan & Minuman', pegawai: 11, omset_jt: 165, legalitas: 95, produksi: 85, sdm: 75, pemasaran: 90, pembiayaan: 70, kemitraan: 65, bidang_upload: 'BID-4|UPT-05', lastPembinaan: '2026-10-10' },
+  { id: 'IKM-2026-011', nama: 'Fashion Hijab Madani', no_telp: '0877-8901-2345', pemilik: 'Ibu Rina Putri', kabkota: 'Surabaya', sektor: 'Tekstil & Fashion', pegawai: 15, omset_jt: 220, legalitas: 95, produksi: 90, sdm: 85, pemasaran: 95, pembiayaan: 80, kemitraan: 75, bidang_upload: 'BID-2', lastPembinaan: '2026-10-11' },
+  { id: 'IKM-2026-012', nama: 'Furniture Kayu Jepara Jatim', no_telp: '0331-456-789', pemilik: 'Bapak Eko Prasetyo', kabkota: 'Jember', sektor: 'Kerajinan', pegawai: 20, omset_jt: 310, legalitas: 90, produksi: 88, sdm: 80, pemasaran: 75, pembiayaan: 82, kemitraan: 88, bidang_upload: 'BID-5', lastPembinaan: '2026-10-07' },
+  { id: 'IKM-2026-013', nama: 'Aneka Rempah Nusantara', no_telp: '0819-2345-6789', pemilik: 'Ibu Dewi Kartika', kabkota: 'Pasuruan', sektor: 'Makanan & Minuman', pegawai: 9, omset_jt: 125, legalitas: 80, produksi: 70, sdm: 65, pemasaran: 70, pembiayaan: 45, kemitraan: 50, bidang_upload: 'BID-2|UPT-04', lastPembinaan: '2026-10-01' },
+  { id: 'IKM-2026-014', nama: 'Dapur Kue Madura', no_telp: '0815-6789-0123', pemilik: 'Ibu Fatimah', kabkota: 'Bangkalan', sektor: 'Makanan & Minuman', pegawai: 5, omset_jt: 62, legalitas: 60, produksi: 50, sdm: 45, pemasaran: 35, pembiayaan: 25, kemitraan: 30, bidang_upload: 'BID-2', lastPembinaan: '2026-09-18' },
+  { id: 'IKM-2026-015', nama: 'Sambal Bu Rudy Khas', no_telp: '031-3456-789', pemilik: 'Ibu Rudy Soetopo', kabkota: 'Surabaya', sektor: 'Makanan & Minuman', pegawai: 22, omset_jt: 380, legalitas: 100, produksi: 95, sdm: 90, pemasaran: 100, pembiayaan: 90, kemitraan: 85, bidang_upload: 'BID-2|UPT-04', lastPembinaan: '2026-10-13' },
+  { id: 'IKM-2026-016', nama: 'Perhiasan Perak Celuk', no_telp: '0822-3456-7890', pemilik: 'Bapak Made Sudarma', kabkota: 'Mojokerto', sektor: 'Kerajinan', pegawai: 8, omset_jt: 145, legalitas: 85, produksi: 80, sdm: 70, pemasaran: 65, pembiayaan: 55, kemitraan: 60, bidang_upload: 'BID-3|UPT-13', lastPembinaan: '2026-10-03' },
+  { id: 'IKM-2026-017', nama: 'Kerupuk Udang Sidoarjo Asli', no_telp: '0816-7890-1234', pemilik: 'Bapak Hasan Basri', kabkota: 'Sidoarjo', sektor: 'Makanan & Minuman', pegawai: 13, omset_jt: 175, legalitas: 90, produksi: 85, sdm: 75, pemasaran: 80, pembiayaan: 70, kemitraan: 72, bidang_upload: 'BID-2|UPT-07', lastPembinaan: '2026-10-09' },
+  { id: 'IKM-2026-018', nama: 'Tenun Ikat Kediri', no_telp: '0354-678-901', pemilik: 'Ibu Mulyani', kabkota: 'Kediri', sektor: 'Tekstil & Fashion', pegawai: 6, omset_jt: 78, legalitas: 65, produksi: 55, sdm: 50, pemasaran: 45, pembiayaan: 30, kemitraan: 35, bidang_upload: 'BID-2', lastPembinaan: '2026-09-22' },
+  { id: 'IKM-2026-019', nama: 'Komponen Otomotif Pandaan', no_telp: '0343-456-789', pemilik: 'Bapak Bambang Hariyanto', kabkota: 'Pasuruan', sektor: 'Logam & Mesin', pegawai: 30, omset_jt: 520, legalitas: 95, produksi: 92, sdm: 88, pemasaran: 70, pembiayaan: 90, kemitraan: 85, bidang_upload: 'BID-1|UPT-01', lastPembinaan: '2026-10-06' },
+  { id: 'IKM-2026-020', nama: 'Madu Hutan Arjuno', no_telp: '0818-9012-3456', pemilik: 'Bapak Sugiyanto', kabkota: 'Batu', sektor: 'Makanan & Minuman', pegawai: 7, omset_jt: 110, legalitas: 80, produksi: 75, sdm: 65, pemasaran: 80, pembiayaan: 55, kemitraan: 58, bidang_upload: 'BID-2', lastPembinaan: '2026-09-30' },
+  { id: 'IKM-2026-021', nama: 'Kulit Magetan Premium', no_telp: '0823-4567-8901', pemilik: 'Bapak Subagyo', kabkota: 'Magetan', sektor: 'Kulit & Alas Kaki', pegawai: 9, omset_jt: 155, legalitas: 85, produksi: 82, sdm: 75, pemasaran: 68, pembiayaan: 65, kemitraan: 72, bidang_upload: 'BID-1|UPT-02', lastPembinaan: '2026-10-04' },
+  { id: 'IKM-2026-022', nama: 'Herbal Jamu Bu Kusmi', no_telp: '0358-234-567', pemilik: 'Ibu Kusmiati', kabkota: 'Nganjuk', sektor: 'Makanan & Minuman', pegawai: 5, omset_jt: 58, legalitas: 55, produksi: 45, sdm: 40, pemasaran: 40, pembiayaan: 20, kemitraan: 25, bidang_upload: 'BID-2', lastPembinaan: '2026-09-16' },
+  { id: 'IKM-2026-023', nama: 'Songkok Gresik Tradisional', no_telp: '0811-2345-6789', pemilik: 'Bapak Zainuddin', kabkota: 'Gresik', sektor: 'Tekstil & Fashion', pegawai: 11, omset_jt: 135, legalitas: 82, produksi: 78, sdm: 72, pemasaran: 70, pembiayaan: 60, kemitraan: 65, bidang_upload: 'BID-1|UPT-03', lastPembinaan: '2026-10-08' },
+  { id: 'IKM-2026-024', nama: 'Cokelat Premium Gunungsari', no_telp: '0817-8901-2345', pemilik: 'Ibu Anita Pratiwi', kabkota: 'Batu', sektor: 'Makanan & Minuman', pegawai: 10, omset_jt: 160, legalitas: 92, produksi: 88, sdm: 82, pemasaran: 95, pembiayaan: 78, kemitraan: 75, bidang_upload: 'BID-3|UPT-06', lastPembinaan: '2026-10-11' }
+];
+
+// ------- PEMBINAAN HISTORY -------
+// Setiap kegiatan tercatat: bidang penanggung jawab + UPT pelaksana (jika ada)
+const pembinaanData = [
+  { tanggal: '2026-10-15', ikm: 'IKM-2026-003', ikmNama: 'Kopi Gunung Arjuno', pilar: 'Pemasaran', bidang: 'BID-4', upt: 'UPT-14', judul: 'Pelatihan Digital Marketing & Foto Produk', peserta: 12, output: 'Peserta mampu membuat konten Instagram & TikTok profesional' },
+  { tanggal: '2026-10-14', ikm: 'IKM-2026-008', ikmNama: 'Sepatu Kulit Raja Magetan', pilar: 'Kemitraan', bidang: 'BID-5', upt: 'UPT-02', judul: 'Business Matching dengan Department Store Nasional', peserta: 1, output: 'Tercapai MOU pasokan 500 pasang/bulan ke Matahari Dept. Store' },
+  { tanggal: '2026-10-13', ikm: 'IKM-2026-015', ikmNama: 'Sambal Bu Rudy Khas', pilar: 'Produksi', bidang: 'BID-2', upt: 'UPT-04', judul: 'Audit & Sertifikasi ISO 22000', peserta: 5, output: 'Sertifikat ISO 22000:2018 diterbitkan' },
+  { tanggal: '2026-10-12', ikm: 'IKM-2026-002', ikmNama: 'CV Rasa Jatim Sejahtera', pilar: 'Pembiayaan', bidang: 'BID-2', upt: null, judul: 'Fasilitasi Akses KUR BNI', peserta: 3, output: 'Pencairan KUR Rp 500 juta untuk ekspansi produksi' },
+  { tanggal: '2026-10-11', ikm: 'IKM-2026-011', ikmNama: 'Fashion Hijab Madani', pilar: 'Pemasaran', bidang: 'BID-4', upt: null, judul: 'Onboarding Marketplace Tokopedia & Shopee', peserta: 4, output: '2 toko resmi aktif dengan 50 SKU terdaftar' },
+  { tanggal: '2026-10-11', ikm: 'IKM-2026-024', ikmNama: 'Cokelat Premium Gunungsari', pilar: 'Legalitas', bidang: 'BID-3', upt: 'UPT-06', judul: 'Pengurusan Sertifikat Halal BPJPH', peserta: 1, output: 'Sertifikat Halal diterbitkan, berlaku 4 tahun' },
+  { tanggal: '2026-10-10', ikm: 'IKM-2026-010', ikmNama: 'Keripik Tempe Sanan', pilar: 'Pemasaran', bidang: 'BID-4', upt: 'UPT-05', judul: 'Workshop Kemasan Modern & Branding', peserta: 8, output: 'Rebranding kemasan dengan info nilai gizi sesuai BPOM' },
+  { tanggal: '2026-10-09', ikm: 'IKM-2026-017', ikmNama: 'Kerupuk Udang Sidoarjo Asli', pilar: 'SDM', bidang: 'BID-2', upt: 'UPT-07', judul: 'Pelatihan Manajemen Produksi Lean', peserta: 6, output: 'Efisiensi produksi naik 18% dalam 1 bulan pascatraining' },
+  { tanggal: '2026-10-08', ikm: 'IKM-2026-001', ikmNama: 'UD Maharani Batik', pilar: 'Kemitraan', bidang: 'BID-5', upt: 'UPT-03', judul: 'Fasilitasi Ekspor ke Malaysia', peserta: 1, output: 'First shipment 200 pcs batik tulis ke Kuala Lumpur' },
+  { tanggal: '2026-10-08', ikm: 'IKM-2026-023', ikmNama: 'Songkok Gresik Tradisional', pilar: 'Produksi', bidang: 'BID-1', upt: 'UPT-03', judul: 'Bantuan Mesin Jahit Industri', peserta: 1, output: 'Kapasitas produksi naik dari 300 ke 500 songkok/minggu' },
+  { tanggal: '2026-10-07', ikm: 'IKM-2026-012', ikmNama: 'Furniture Kayu Jepara Jatim', pilar: 'Kemitraan', bidang: 'BID-5', upt: null, judul: 'Kemitraan Supply Chain dengan PT IKEA Indonesia', peserta: 2, output: 'Kontrak pasokan 6 bulan senilai Rp 1.2 miliar' },
+  { tanggal: '2026-10-06', ikm: 'IKM-2026-019', ikmNama: 'Komponen Otomotif Pandaan', pilar: 'Produksi', bidang: 'BID-1', upt: 'UPT-01', judul: 'Upgrading Mesin CNC & Training Operator', peserta: 5, output: 'Presisi produksi meningkat ke tolerance ±0.05mm' },
+  { tanggal: '2026-10-05', ikm: 'IKM-2026-004', ikmNama: 'PT Sumber Rejeki Logam', pilar: 'Pemasaran', bidang: 'BID-4', upt: null, judul: 'Pendampingan Pembuatan Website & Katalog Digital', peserta: 2, output: 'Website korporat dengan e-catalog 120 produk go-live' },
+  { tanggal: '2026-10-04', ikm: 'IKM-2026-021', ikmNama: 'Kulit Magetan Premium', pilar: 'SDM', bidang: 'BID-2', upt: 'UPT-02', judul: 'Sertifikasi Kompetensi Pengrajin Kulit BNSP', peserta: 7, output: '7 pengrajin memiliki sertifikat kompetensi nasional' },
+  { tanggal: '2026-10-03', ikm: 'IKM-2026-016', ikmNama: 'Perhiasan Perak Celuk', pilar: 'Legalitas', bidang: 'BID-3', upt: 'UPT-13', judul: 'Pendaftaran Merek Dagang ke DJKI', peserta: 1, output: 'Merek terdaftar dengan sertifikat HAKI' },
+  { tanggal: '2026-10-02', ikm: 'IKM-2026-007', ikmNama: 'Rotan Wicaksana Craft', pilar: 'Pemasaran', bidang: 'BID-4', upt: 'UPT-03', judul: 'Partisipasi Pameran INACRAFT Jakarta', peserta: 2, output: 'Booking order Rp 450 juta dari buyer domestik & mancanegara' },
+  { tanggal: '2026-10-01', ikm: 'IKM-2026-013', ikmNama: 'Aneka Rempah Nusantara', pilar: 'Produksi', bidang: 'BID-2', upt: 'UPT-04', judul: 'Pendampingan Penerapan GMP', peserta: 4, output: 'SOP produksi GMP tersusun, area produksi sesuai standar' },
+  { tanggal: '2026-09-30', ikm: 'IKM-2026-020', ikmNama: 'Madu Hutan Arjuno', pilar: 'Legalitas', bidang: 'BID-3', upt: 'UPT-06', judul: 'Pengurusan Izin Edar BPOM', peserta: 1, output: 'Nomor izin edar BPOM diterbitkan untuk 3 varian' },
+  { tanggal: '2026-09-28', ikm: 'IKM-2026-005', ikmNama: 'Kerajinan Bambu Lestari', pilar: 'SDM', bidang: 'BID-2', upt: 'UPT-07', judul: 'Pelatihan Desain Produk Kontemporer', peserta: 6, output: '3 desain baru siap produksi untuk pasar ekspor' },
+  { tanggal: '2026-09-25', ikm: 'IKM-2026-009', ikmNama: 'Batik Tulis Tanjung Bumi', pilar: 'Pemasaran', bidang: 'BID-4', upt: 'UPT-03', judul: 'Workshop Storytelling Produk Heritage', peserta: 5, output: 'Narasi produk tersusun untuk setiap motif batik' },
+  { tanggal: '2026-09-22', ikm: 'IKM-2026-018', ikmNama: 'Tenun Ikat Kediri', pilar: 'SDM', bidang: 'BID-2', upt: 'UPT-07', judul: 'Regenerasi Penenun Muda', peserta: 8, output: '8 penenun muda direkrut & memulai pelatihan 3 bulan' },
+  { tanggal: '2026-09-20', ikm: 'IKM-2026-006', ikmNama: 'Tempe Sehat Pak Narto', pilar: 'Legalitas', bidang: 'BID-3', upt: 'UPT-06', judul: 'Fasilitasi Pengurusan NIB & PIRT', peserta: 1, output: 'NIB terbit, PIRT dalam proses verifikasi lapangan' }
+];
+
+// ------- PELAYANAN DATA -------
+const pelayananData = [
+  { nama: 'Fasilitasi Sertifikat Halal', permohonan: 24, selesai: 18, avg_hari: 28, pilar: 'Legalitas' },
+  { nama: 'Konsultasi Kemasan & Branding', permohonan: 31, selesai: 29, avg_hari: 5, pilar: 'Pemasaran' },
+  { nama: 'Kurasi Produk untuk Pameran', permohonan: 18, selesai: 15, avg_hari: 10, pilar: 'Pemasaran' },
+  { nama: 'Pendampingan Akses KUR', permohonan: 14, selesai: 9, avg_hari: 45, pilar: 'Pembiayaan' },
+  { nama: 'Pengurusan NIB & PIRT', permohonan: 22, selesai: 20, avg_hari: 14, pilar: 'Legalitas' },
+  { nama: 'Business Matching', permohonan: 9, selesai: 6, avg_hari: 30, pilar: 'Kemitraan' },
+  { nama: 'Pelatihan Teknis Produksi', permohonan: 27, selesai: 24, avg_hari: 7, pilar: 'Produksi' },
+  { nama: 'Sertifikasi Kompetensi SDM', permohonan: 11, selesai: 8, avg_hari: 21, pilar: 'SDM' }
+];
+
+/* ============================================================
+   LOCAL STORAGE — SIMPAN & MUAT DATA
+   ============================================================ */
+
+const LS_IKM       = 'simpikm_ikmData';
+const LS_PEMBINAAN = 'simpikm_pembinaanData';
+const LS_PELAYANAN = 'simpikm_pelayananData';
+const LS_VERSION   = 'simpikm_version';
+const DATA_VERSION = '2026-1';
+
+// Simpan semua data ke localStorage
+function saveAll() {
+  try {
+    localStorage.setItem(LS_IKM,       JSON.stringify(ikmData));
+    localStorage.setItem(LS_PEMBINAAN, JSON.stringify(pembinaanData));
+    localStorage.setItem(LS_PELAYANAN, JSON.stringify(pelayananData));
+    localStorage.setItem(LS_VERSION,   DATA_VERSION);
+  } catch(e) {
+    console.warn('localStorage penuh atau tidak tersedia:', e);
+  }
+}
+
+// Muat data dari localStorage (jika ada), ganti variable runtime
+function loadFromStorage() {
+  try {
+    const ver = localStorage.getItem(LS_VERSION);
+    if (!ver) return false; // belum ada data tersimpan
+
+    const savedIkm       = localStorage.getItem(LS_IKM);
+    const savedPembinaan = localStorage.getItem(LS_PEMBINAAN);
+    const savedPelayanan = localStorage.getItem(LS_PELAYANAN);
+
+    if (savedIkm)       { ikmData.length = 0;       JSON.parse(savedIkm).forEach(x => ikmData.push(x)); }
+    if (savedPembinaan) { pembinaanData.length = 0;  JSON.parse(savedPembinaan).forEach(x => pembinaanData.push(x)); }
+    if (savedPelayanan) { pelayananData.length = 0;  JSON.parse(savedPelayanan).forEach(x => pelayananData.push(x)); }
+    return true;
+  } catch(e) {
+    console.warn('Gagal muat dari localStorage:', e);
+    return false;
+  }
+}
+
+// Reset data ke default (hapus localStorage)
+function resetDataDefault() {
+  if (!confirm('Reset semua data ke kondisi awal demo? Data yang sudah ditambahkan akan hilang.')) return;
+  localStorage.removeItem(LS_IKM);
+  localStorage.removeItem(LS_PEMBINAAN);
+  localStorage.removeItem(LS_PELAYANAN);
+  localStorage.removeItem(LS_VERSION);
+  location.reload();
+}
+
+// Info storage
+function getStorageInfo() {
+  try {
+    const ikmSize  = (localStorage.getItem(LS_IKM) || '').length;
+    const pemSize  = (localStorage.getItem(LS_PEMBINAAN) || '').length;
+    const pelSize  = (localStorage.getItem(LS_PELAYANAN) || '').length;
+    const totalKB  = Math.round((ikmSize + pemSize + pelSize) / 1024 * 10) / 10;
+    return totalKB;
+  } catch(e) { return 0; }
+}
+
+/* ============================================================
+   UTILITY FUNCTIONS
+   ============================================================ */
+
+function avgPilar(ikm) {
+  return Math.round((ikm.legalitas + ikm.produksi + ikm.sdm + ikm.pemasaran + ikm.pembiayaan + ikm.kemitraan) / 6);
+}
+
+function getStatus(ikm) {
+  // Paripurna: semua pilar ≥ 80. Proses: rata-rata ≥ 50. Belum: di bawah itu.
+  const pilars = [ikm.legalitas, ikm.produksi, ikm.sdm, ikm.pemasaran, ikm.pembiayaan, ikm.kemitraan];
+  const min = Math.min(...pilars);
+  const avg = avgPilar(ikm);
+  if (min >= 80) return 'Paripurna';
+  if (avg >= 50) return 'Proses';
+  return 'Belum';
+}
+
+function badgeHTML(status) {
+  const map = {
+    'Paripurna': 'badge-paripurna', 'Proses': 'badge-proses', 'Belum': 'badge-belum'
+  };
+  const labels = { 'Paripurna': 'Paripurna', 'Proses': 'Dalam Pembinaan', 'Belum': 'Belum Terbina' };
+  return `<span class="badge ${map[status]}"><span class="badge-dot"></span>${labels[status]}</span>`;
+}
+
+function fmtDate(d) {
+  const dt = new Date(d);
+  return dt.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function fmtDateShort(d) {
+  const dt = new Date(d);
+  return dt.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+}
+
+function pillarColor(pct) {
+  if (pct >= 80) return 'var(--teal-400)';
+  if (pct >= 50) return 'var(--amber-400)';
+  return 'var(--red-400)';
+}
+
+function pillarClass(pct) {
+  if (pct >= 80) return '';
+  if (pct >= 50) return 'amber';
+  return 'red';
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector(`.nav-item[data-page="${page}"]`).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'profil') renderProfilTable();
+  if (page === 'pembinaan') renderPembinaan();
+  if (page === 'pelayanan') renderPelayanan();
+  if (page === 'analitik') renderAnalitik();
+  if (page === 'tupoksi') renderTupoksi();
+  if (page === 'tentang') renderTentang();
+  if (page === 'upload') {
+    const kb = getStorageInfo();
+    const el = document.getElementById('storageKBDisplay');
+    const txt = document.getElementById('storageStatusText');
+    if (el) el.textContent = kb;
+    if (txt) {
+      const hasData = localStorage.getItem(LS_VERSION);
+      txt.textContent = hasData
+        ? `Data aktif tersimpan: ${ikmData.length} IKM · ${pembinaanData.length} kegiatan. Aman dari refresh & tutup tab.`
+        : 'Data akan disimpan otomatis setelah pertama kali upload CSV atau tambah kegiatan.';
+    }
+  }
+}
+
+document.querySelectorAll('.nav-item').forEach(n => {
+  n.addEventListener('click', () => goTo(n.dataset.page));
+});
+
+/* ============================================================
+   DASHBOARD PAGE
+   ============================================================ */
+
+let chartRadar, chartDonut, chartKabkota, chartTrend;
+
+function renderDashboard() {
+  const total = ikmData.length;
+  const paripurna = ikmData.filter(i => getStatus(i) === 'Paripurna').length;
+  const proses = ikmData.filter(i => getStatus(i) === 'Proses').length;
+  const belum = ikmData.filter(i => getStatus(i) === 'Belum').length;
+
+  document.getElementById('kpi-total').innerHTML = total + ' <span class="kpi-unit">IKM</span>';
+  document.getElementById('kpi-paripurna').innerHTML = paripurna + ' <span class="kpi-unit">IKM</span>';
+  document.getElementById('kpi-proses').innerHTML = proses + ' <span class="kpi-unit">IKM</span>';
+  document.getElementById('kpi-kegiatan').innerHTML = pembinaanData.length + ' <span class="kpi-unit">kegiatan</span>';
+
+  document.getElementById('hero-capaian').textContent = paripurna + ' IKM';
+  document.getElementById('hero-progres').textContent = Math.round((paripurna / 150) * 100) + '%';
+
+  document.getElementById('leg-par').textContent = paripurna;
+  document.getElementById('leg-pros').textContent = proses;
+  document.getElementById('leg-bel').textContent = belum;
+
+  // RADAR — avg pilar
+  const avgByPilar = PILAR.map(p => {
+    return Math.round(ikmData.reduce((s, i) => s + i[p.key], 0) / ikmData.length);
+  });
+
+  if (chartRadar) chartRadar.destroy();
+  chartRadar = new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+      labels: PILAR.map(p => p.label),
+      datasets: [{
+        label: 'Rata-rata capaian',
+        data: avgByPilar,
+        backgroundColor: 'rgba(15, 110, 86, 0.15)',
+        borderColor: '#0f6e56',
+        borderWidth: 2,
+        pointBackgroundColor: '#d85a30',
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 2,
+        pointRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        r: {
+          min: 0, max: 100,
+          ticks: { stepSize: 25, color: '#8a9594', backdropColor: 'transparent', font: { size: 10 } },
+          grid: { color: '#e6ddc9' },
+          angleLines: { color: '#e6ddc9' },
+          pointLabels: { color: '#1a2e2b', font: { size: 11, weight: '600', family: 'Plus Jakarta Sans' } }
+        }
+      }
+    }
+  });
+
+  // DONUT
+  if (chartDonut) chartDonut.destroy();
+  chartDonut = new Chart(document.getElementById('donutChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Paripurna', 'Proses', 'Belum'],
+      datasets: [{
+        data: [paripurna, proses, belum],
+        backgroundColor: ['#1d9e75', '#ef9f27', '#e24b4a'],
+        borderColor: '#ffffff',
+        borderWidth: 2,
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '72%',
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // KAB/KOTA BAR
+  const kabMap = {};
+  ikmData.filter(i => getStatus(i) === 'Paripurna').forEach(i => {
+    kabMap[i.kabkota] = (kabMap[i.kabkota] || 0) + 1;
+  });
+  // Make sure we have at least some bars — also add IKM in proses weighted half
+  ikmData.filter(i => getStatus(i) === 'Proses').forEach(i => {
+    kabMap[i.kabkota] = (kabMap[i.kabkota] || 0) + 0.5;
+  });
+  const kabSorted = Object.entries(kabMap).sort((a, b) => b[1] - a[1]).slice(0, 10);
+
+  if (chartKabkota) chartKabkota.destroy();
+  chartKabkota = new Chart(document.getElementById('kabkotaChart'), {
+    type: 'bar',
+    data: {
+      labels: kabSorted.map(k => k[0]),
+      datasets: [{
+        label: 'IKM',
+        data: kabSorted.map(k => k[1]),
+        backgroundColor: '#0f6e56',
+        borderRadius: 6,
+        barThickness: 14
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: 'y',
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => c.parsed.x + ' IKM (Paripurna + 0.5 × Proses)' } } },
+      scales: {
+        x: { beginAtZero: true, ticks: { color: '#8a9594', font: { size: 11 } }, grid: { color: '#f0ebdd' } },
+        y: { ticks: { color: '#1a2e2b', font: { size: 11, weight: '500' } }, grid: { display: false } }
+      }
+    }
+  });
+
+  // RECENT ACTIVITY
+  const recentHTML = pembinaanData.slice(0, 6).map(p => {
+    const colorClass = p.pilar === 'Pemasaran' || p.pilar === 'Kemitraan' ? 'coral' : p.pilar === 'SDM' || p.pilar === 'Produksi' ? 'amber' : '';
+    return `
+      <div class="timeline-item ${colorClass}" style="padding-bottom: 14px;">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">${fmtDateShort(p.tanggal)}</div>
+        <div class="timeline-title" style="font-size:13px;">${p.judul}</div>
+        <div class="timeline-body" style="font-size:12px;">${p.ikmNama} · Pilar ${p.pilar}</div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('recentActivity').innerHTML = `<div class="timeline" style="padding-left:24px;">${recentHTML}</div>`;
+
+  // TREND CHART — last 3 months, per pilar
+  const months = ['Agu', 'Sep', 'Okt'];
+  // simulated data
+  const trendData = {
+    'Legalitas': [4, 5, 6],
+    'Produksi': [6, 7, 8],
+    'SDM': [3, 4, 5],
+    'Pemasaran': [5, 8, 9],
+    'Pembiayaan': [2, 3, 3],
+    'Kemitraan': [2, 3, 4]
+  };
+  const colors = ['#0f6e56', '#d85a30', '#ef9f27', '#378add', '#7f77dd', '#97c459'];
+
+  if (chartTrend) chartTrend.destroy();
+  chartTrend = new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: Object.entries(trendData).map(([name, data], i) => ({
+        label: name,
+        data,
+        borderColor: colors[i],
+        backgroundColor: colors[i] + '20',
+        tension: 0.3,
+        borderWidth: 2,
+        pointRadius: 4,
+        pointBackgroundColor: colors[i]
+      }))
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', align: 'end', labels: { boxWidth: 10, boxHeight: 10, font: { size: 11 }, color: '#5a6b6a', padding: 10 } }
+      },
+      scales: {
+        x: { ticks: { color: '#8a9594' }, grid: { display: false } },
+        y: { beginAtZero: true, ticks: { color: '#8a9594', stepSize: 2 }, grid: { color: '#f0ebdd' } }
+      }
+    }
+  });
+
+  // MINI-WIDGET: Kegiatan per Bidang
+  const maxBidangVal = Math.max(...BIDANG.map(b => pembinaanData.filter(p => p.bidang === b.kode).length));
+  const dashBidangHTML = BIDANG.map(b => {
+    const count = pembinaanData.filter(p => p.bidang === b.kode).length;
+    const pct = maxBidangVal > 0 ? Math.round((count / maxBidangVal) * 100) : 0;
+    const fillColor = b.warna === 'teal' ? 'var(--teal-400)' : b.warna === 'coral' ? 'var(--coral-400)' : 'var(--amber-400)';
+    return `
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="flex: 0 0 140px; font-size: 12px; font-weight: 600; color: var(--ink);">${b.singkat}</div>
+        <div style="flex: 1; height: 8px; background: var(--line-soft); border-radius: 8px; overflow: hidden;">
+          <div style="height: 100%; width: ${pct}%; background: ${fillColor}; border-radius: 8px;"></div>
+        </div>
+        <div style="font-size: 12px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; min-width: 24px; text-align: right;">${count}</div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('dashBidangList').innerHTML = dashBidangHTML;
+
+  // MINI-WIDGET: Top 5 UPT aktif
+  const topUPT = UPT.map(u => ({ u, count: pembinaanData.filter(p => p.upt === u.kode).length }))
+    .filter(x => x.count > 0)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+  const dashUPTHTML = topUPT.map((x, idx) => {
+    return `
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 22px; height: 22px; background: var(--teal-50); color: var(--teal-800); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0;">${idx + 1}</div>
+        <div style="flex: 1; overflow: hidden;">
+          <div style="font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${x.u.nama.replace('UPT ', '')}</div>
+          <div style="font-size: 10px; color: var(--ink-soft); letter-spacing: 0.06em;">${x.u.kode} · ${x.u.lokasi}</div>
+        </div>
+        <div style="font-size: 12px; font-weight: 700; color: var(--teal-800); font-variant-numeric: tabular-nums;">${x.count} keg.</div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('dashUPTList').innerHTML = dashUPTHTML;
+}
+
+/* ============================================================
+   PROFIL IKM PAGE
+   ============================================================ */
+
+function populateFilters() {
+  const kabkotaSet = [...new Set(ikmData.map(i => i.kabkota))].sort();
+  const sektorSet = [...new Set(ikmData.map(i => i.sektor))].sort();
+
+  const kabEl = document.getElementById('filterKabkota');
+  const secEl = document.getElementById('filterSektor');
+  const bidEl = document.getElementById('filterBidang');
+  kabEl.innerHTML = '<option value="">Semua Kab/Kota</option>' + kabkotaSet.map(k => `<option value="${k}">${k}</option>`).join('');
+  secEl.innerHTML = '<option value="">Semua Sektor</option>' + sektorSet.map(s => `<option value="${s}">${s}</option>`).join('');
+  bidEl.innerHTML = '<option value="">Semua Bidang</option>' + BIDANG.map(b => `<option value="${b.kode}">${b.singkat}</option>`).join('');
+}
+
+function renderProfilTable() {
+  populateFilters();
+  const search = (document.getElementById('searchInput').value || '').toLowerCase();
+  const kab = document.getElementById('filterKabkota').value;
+  const sek = document.getElementById('filterSektor').value;
+  const bid = document.getElementById('filterBidang').value;
+  const sts = document.getElementById('filterStatus').value;
+
+  const filtered = ikmData.filter(i => {
+    const ikmBidang = getBidangForSektor(i.sektor);
+    if (search && !(i.nama.toLowerCase().includes(search) || i.pemilik.toLowerCase().includes(search) || i.id.toLowerCase().includes(search))) return false;
+    if (kab && i.kabkota !== kab) return false;
+    if (sek && i.sektor !== sek) return false;
+    if (bid && ikmBidang !== bid) return false;
+    if (sts && getStatus(i) !== sts) return false;
+    return true;
+  });
+
+  const tbody = document.getElementById('ikmTableBody');
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">Tidak ada IKM yang sesuai filter</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(i => {
+    const avg = avgPilar(i);
+    const status = getStatus(i);
+    const fillClass = pillarClass(avg);
+    const bidangKode = getBidangForSektor(i.sektor);
+    const bidang = BIDANG.find(b => b.kode === bidangKode);
+    return `
+      <tr onclick="openIKMDetail('${i.id}')">
+        <td>
+          <div class="ikm-name">${i.nama}</div>
+          <div class="ikm-id">${i.id} · ${i.pemilik}</div>
+        </td>
+        <td style="font-size: 12px; font-variant-numeric: tabular-nums;">${i.no_telp || '<span style="color:var(--ink-soft);">—</span>'}</td>
+        <td style="font-size: 12px;">${i.kabkota}</td>
+        <td><span class="sector-tag">${i.sektor}</span></td>
+        <td style="font-size: 12px;">
+          <div style="font-weight: 600; color: var(--ink);">${bidang.singkat}</div>
+          <div style="font-size: 10px; color: var(--ink-soft); letter-spacing: 0.06em;">${bidang.kode}</div>
+        </td>
+        <td>
+          <div class="progress-inline">
+            <div class="progress-bar"><div class="progress-fill ${fillClass}" style="width:${avg}%;"></div></div>
+            <span class="progress-text">${avg}%</span>
+          </div>
+        </td>
+        <td>${badgeHTML(status)}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+document.getElementById('searchInput')?.addEventListener('input', renderProfilTable);
+document.getElementById('filterKabkota')?.addEventListener('change', renderProfilTable);
+document.getElementById('filterSektor')?.addEventListener('change', renderProfilTable);
+document.getElementById('filterBidang')?.addEventListener('change', renderProfilTable);
+document.getElementById('filterStatus')?.addEventListener('change', renderProfilTable);
+
+/* ============================================================
+   IKM DETAIL MODAL
+   ============================================================ */
+
+function openIKMDetail(id) {
+  const ikm = ikmData.find(i => i.id === id);
+  if (!ikm) return;
+
+  document.getElementById('modalId').textContent = ikm.id;
+  document.getElementById('modalNama').textContent = ikm.nama;
+  document.getElementById('modalPemilik').textContent = 'Pemilik: ' + ikm.pemilik;
+  document.getElementById('modalKabkota').textContent = ikm.kabkota;
+  document.getElementById('modalSektor').textContent = ikm.sektor;
+  document.getElementById('modalNoTelp').textContent = ikm.no_telp || '—';
+  document.getElementById('modalPegawai').textContent = ikm.pegawai + ' orang';
+  document.getElementById('modalOmset').textContent = 'Rp ' + ikm.omset_jt + ' jt';
+
+  // Bidang Pembina
+  const bidangKode = getBidangForSektor(ikm.sektor);
+  const bidang = BIDANG.find(b => b.kode === bidangKode);
+  document.getElementById('modalBidang').innerHTML = `${bidang.nama} <span style="color:var(--teal-600); font-size:11px; font-weight:600; letter-spacing:0.08em;">· ${bidang.kode}</span>`;
+
+  // UPT yang pernah terlibat
+  const uptCodes = [...new Set(pembinaanData.filter(p => p.ikm === ikm.id && p.upt).map(p => p.upt))];
+  if (uptCodes.length === 0) {
+    document.getElementById('modalUPT').innerHTML = '<em style="color:var(--ink-soft);">Belum ada UPT yang terlibat</em>';
+  } else {
+    const uptInfos = uptCodes.map(c => {
+      const u = UPT.find(x => x.kode === c);
+      return u ? `<span style="display:inline-block; background:var(--white); padding:3px 8px; border-radius:6px; margin-right:4px; margin-bottom:4px; font-weight:600;">${u.kode}</span> <span style="color:var(--ink-muted); margin-right:10px;">${u.nama.replace('UPT ', '')}</span>` : '';
+    }).join('<br>');
+    document.getElementById('modalUPT').innerHTML = uptInfos;
+  }
+
+  const status = getStatus(ikm);
+  const avg = avgPilar(ikm);
+  document.getElementById('modalStatus').innerHTML = badgeHTML(status);
+  document.getElementById('modalAvg').textContent = avg + '%';
+
+  // PILAR CARDS
+  document.getElementById('modalPilar').innerHTML = PILAR.map(p => {
+    const v = ikm[p.key];
+    const color = pillarColor(v);
+    const items = p.items.map((it, idx) => {
+      // simulate: show item as done if its share of pillar value is covered
+      const threshold = ((idx + 1) / p.items.length) * 100;
+      return `<span class="pilar-item ${v >= threshold ? 'done' : ''}">${it}</span>`;
+    }).join('');
+    return `
+      <div class="pilar-card">
+        <div class="pilar-head">
+          <div class="pilar-name">${p.label}</div>
+          <div class="pilar-pct">${v}%</div>
+        </div>
+        <div class="pilar-bar"><div class="pilar-fill" style="width:${v}%; background:${color};"></div></div>
+        <div class="pilar-items">${items}</div>
+      </div>
+    `;
+  }).join('');
+
+  // RIWAYAT PEMBINAAN
+  const riwayat = pembinaanData.filter(p => p.ikm === id);
+  if (riwayat.length === 0) {
+    document.getElementById('modalRiwayat').innerHTML = '<div class="empty" style="padding: 16px 0; text-align:left;">Belum ada riwayat pembinaan tercatat.</div>';
+  } else {
+    document.getElementById('modalRiwayat').innerHTML = `
+      <div class="timeline" style="padding-left:24px;">
+        ${riwayat.slice(0, 5).map(r => {
+          const b = BIDANG.find(x => x.kode === r.bidang);
+          const u = r.upt ? UPT.find(x => x.kode === r.upt) : null;
+          const exec = u ? `${b ? b.singkat : '—'} · dilaksanakan oleh ${u.kode}` : `${b ? b.singkat : '—'} (internal)`;
+          return `
+          <div class="timeline-item" style="padding-bottom: 12px;">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date">${fmtDateShort(r.tanggal)} · Pilar ${r.pilar}</div>
+            <div class="timeline-title" style="font-size:13px;">${r.judul}</div>
+            <div class="timeline-body" style="font-size:12px;">${r.output}</div>
+            <div style="font-size:11px; color:var(--teal-800); font-weight:600; margin-top:3px;">⌂ ${exec}</div>
+          </div>
+        `}).join('')}
+      </div>
+    `;
+  }
+
+  document.getElementById('ikmModal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('ikmModal').classList.remove('active');
+}
+
+document.getElementById('ikmModal').addEventListener('click', (e) => {
+  if (e.target.id === 'ikmModal') closeModal();
+});
+
+/* ============================================================
+   PEMBINAAN PAGE
+   ============================================================ */
+
+function renderPembinaan() {
+  document.getElementById('kpi-keg-total').innerHTML = pembinaanData.length + ' <span class="kpi-unit">kegiatan</span>';
+  const uniqueIkm = [...new Set(pembinaanData.map(p => p.ikm))].length;
+  document.getElementById('kpi-keg-ikm').innerHTML = uniqueIkm + ' <span class="kpi-unit">IKM</span>';
+
+  const filter = document.getElementById('filterPembinaan').value;
+  const filtered = filter ? pembinaanData.filter(p => p.pilar === filter) : pembinaanData;
+
+  const html = filtered.map(p => {
+    const colorClass = ['Pemasaran', 'Kemitraan'].includes(p.pilar) ? 'coral' : ['SDM', 'Produksi'].includes(p.pilar) ? 'amber' : '';
+    const b = BIDANG.find(x => x.kode === p.bidang);
+    const u = p.upt ? UPT.find(x => x.kode === p.upt) : null;
+    return `
+      <div class="timeline-item ${colorClass}">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">${fmtDate(p.tanggal)} · PILAR ${p.pilar.toUpperCase()}</div>
+        <div class="timeline-title">${p.judul}</div>
+        <div class="timeline-body">${p.output}</div>
+        <div class="timeline-meta">
+          <span>📍 ${p.ikmNama}</span>
+          <span>·</span>
+          <span>👥 ${p.peserta} peserta</span>
+        </div>
+        <div style="margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap;">
+          <span style="font-size: 10px; padding: 2px 8px; background: var(--teal-50); color: var(--teal-800); border-radius: 12px; font-weight: 600;">⚑ ${b ? b.singkat : '—'}</span>
+          ${u ? `<span style="font-size: 10px; padding: 2px 8px; background: var(--coral-50); color: var(--coral-600); border-radius: 12px; font-weight: 600;">⌂ ${u.kode} · ${u.lokasi}</span>` : '<span style="font-size: 10px; padding: 2px 8px; background: var(--cream-dark); color: var(--ink-soft); border-radius: 12px; font-weight: 600;">⌂ Pelaksanaan internal Bidang</span>'}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('timelineContainer').innerHTML = html || '<div class="empty">Tidak ada kegiatan pada pilar ini.</div>';
+}
+
+document.getElementById('filterPembinaan')?.addEventListener('change', renderPembinaan);
+
+function addKegiatanDemo() {
+  const pilars = ['Legalitas', 'Produksi', 'SDM', 'Pemasaran', 'Pembiayaan', 'Kemitraan'];
+  const judul = ['Pelatihan Teknis', 'Workshop Branding', 'Konsultasi Mutu', 'Pendampingan Sertifikasi', 'Business Matching'];
+  const ikm = ikmData[Math.floor(Math.random() * ikmData.length)];
+  const pilar = pilars[Math.floor(Math.random() * pilars.length)];
+  pembinaanData.unshift({
+    tanggal: new Date().toISOString().slice(0, 10),
+    ikm: ikm.id,
+    ikmNama: ikm.nama,
+    pilar,
+    judul: judul[Math.floor(Math.random() * judul.length)] + ' — ' + ikm.nama.split(' ').slice(-1)[0],
+    peserta: Math.floor(Math.random() * 10) + 3,
+    output: 'Kegiatan berhasil dilaksanakan. Status pilar ' + pilar + ' meningkat pada IKM terkait.'
+  });
+  renderPembinaan();
+  saveAll();
+  toast('Kegiatan baru berhasil dicatat & disimpan ke browser');
+}
+
+/* ============================================================
+   PELAYANAN PAGE
+   ============================================================ */
+
+let chartLayanan;
+
+function renderPelayanan() {
+  const html = pelayananData.map(l => {
+    const pct = Math.round((l.selesai / l.permohonan) * 100);
+    return `
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: var(--cream); border-radius: 10px;">
+        <div style="flex: 1;">
+          <div style="font-size: 13px; font-weight: 600; color: var(--ink);">${l.nama}</div>
+          <div style="font-size: 11px; color: var(--ink-soft); margin-top: 2px;">Pilar ${l.pilar} · Avg ${l.avg_hari} hari</div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600; color: var(--teal-800);">${l.selesai}/${l.permohonan}</div>
+          <div style="font-size: 11px; color: var(--ink-soft);">${pct}% selesai</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('layananList').innerHTML = html;
+
+  if (chartLayanan) chartLayanan.destroy();
+  chartLayanan = new Chart(document.getElementById('layananChart'), {
+    type: 'bar',
+    data: {
+      labels: pelayananData.map(l => l.nama.length > 22 ? l.nama.slice(0, 20) + '…' : l.nama),
+      datasets: [
+        { label: 'Permohonan', data: pelayananData.map(l => l.permohonan), backgroundColor: '#5dcaa5', borderRadius: 4 },
+        { label: 'Selesai', data: pelayananData.map(l => l.selesai), backgroundColor: '#0f6e56', borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', align: 'end', labels: { boxWidth: 10, boxHeight: 10, font: { size: 11 }, color: '#5a6b6a' } } },
+      scales: {
+        x: { ticks: { color: '#8a9594', font: { size: 10 }, maxRotation: 40, minRotation: 30 }, grid: { display: false } },
+        y: { beginAtZero: true, ticks: { color: '#8a9594' }, grid: { color: '#f0ebdd' } }
+      }
+    }
+  });
+}
+
+/* ============================================================
+   KOORDINASI TUPOKSI PAGE
+   ============================================================ */
+
+let chartBidangWorkload, chartUPTContrib;
+
+function renderTupoksi() {
+  // 1. BIDANG CARDS
+  const bidangHTML = BIDANG.map(b => {
+    // hitung statistik per bidang
+    const ikmJumlah = ikmData.filter(i => getBidangForSektor(i.sektor) === b.kode).length;
+    const kegiatanJumlah = pembinaanData.filter(p => p.bidang === b.kode).length;
+    return `
+      <div class="bidang-card ${b.warna}">
+        <div class="bidang-kode">${b.kode}</div>
+        <div class="bidang-name">${b.nama}</div>
+        <div class="bidang-fokus">${b.fokus}</div>
+        <div class="bidang-stats">
+          <div class="bidang-stat">
+            <div class="bidang-stat-val">${ikmJumlah}</div>
+            <div class="bidang-stat-label">IKM dibina</div>
+          </div>
+          <div class="bidang-stat">
+            <div class="bidang-stat-val">${kegiatanJumlah}</div>
+            <div class="bidang-stat-label">Kegiatan</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('bidangGrid').innerHTML = bidangHTML;
+
+  // 2. UPT GRID
+  const uptHTML = UPT.map((u, idx) => {
+    const bInduk = BIDANG.find(b => b.kode === u.bidangInduk);
+    const kegiatanCount = pembinaanData.filter(p => p.upt === u.kode).length;
+    return `
+      <div class="upt-card">
+        <div class="upt-num">${String(idx + 1).padStart(2, '0')}</div>
+        <div style="flex: 1;">
+          <div class="upt-name">${u.nama}</div>
+          <div class="upt-meta">
+            <span>📍 ${u.lokasi}</span>
+            <span>·</span>
+            <span>Induk: ${bInduk.singkat}</span>
+            <span>·</span>
+            <span style="color: var(--teal-800); font-weight: 600;">${kegiatanCount} keg.</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('uptGrid').innerHTML = uptHTML;
+
+  // 3. RACI MATRIX
+  let raciHTML = '<thead><tr><th class="row-head">Pilar Paripurna</th>';
+  BIDANG.forEach(b => { raciHTML += `<th title="${b.nama}">${b.kode}</th>`; });
+  raciHTML += '</tr></thead><tbody>';
+  PILAR.forEach(p => {
+    raciHTML += `<tr><td class="row-head">${p.label}</td>`;
+    BIDANG.forEach(b => {
+      const role = TUPOKSI_MATRIX[p.key][b.kode];
+      if (role === '-') {
+        raciHTML += '<td><span class="raci-empty">—</span></td>';
+      } else {
+        raciHTML += `<td><span class="raci-cell raci-${role}">${role}</span></td>`;
+      }
+    });
+    raciHTML += '</tr>';
+  });
+  raciHTML += '</tbody>';
+  document.getElementById('raciTable').innerHTML = raciHTML;
+
+  // 4. BIDANG WORKLOAD CHART
+  const workloadData = BIDANG.map(b => ({
+    nama: b.singkat,
+    kegiatan: pembinaanData.filter(p => p.bidang === b.kode).length
+  }));
+
+  if (chartBidangWorkload) chartBidangWorkload.destroy();
+  chartBidangWorkload = new Chart(document.getElementById('bidangWorkloadChart'), {
+    type: 'bar',
+    data: {
+      labels: workloadData.map(w => w.nama),
+      datasets: [{
+        label: 'Kegiatan',
+        data: workloadData.map(w => w.kegiatan),
+        backgroundColor: ['#1d9e75', '#d85a30', '#ef9f27', '#5dcaa5', '#f5c4b3', '#b4b2a9'],
+        borderRadius: 6,
+        barThickness: 22
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { beginAtZero: true, ticks: { color: '#8a9594', stepSize: 2 }, grid: { color: '#f0ebdd' } },
+        y: { ticks: { color: '#1a2e2b', font: { size: 11, weight: '500' } }, grid: { display: false } }
+      }
+    }
+  });
+
+  // 5. UPT CONTRIBUTION CHART (top 8 aktif)
+  const uptContrib = UPT.map(u => ({
+    kode: u.kode,
+    nama: u.nama.replace('UPT ', '').replace('Kemetrologian ', 'Kem. '),
+    jumlah: pembinaanData.filter(p => p.upt === u.kode).length
+  })).filter(u => u.jumlah > 0).sort((a, b) => b.jumlah - a.jumlah).slice(0, 8);
+
+  if (chartUPTContrib) chartUPTContrib.destroy();
+  chartUPTContrib = new Chart(document.getElementById('uptContribChart'), {
+    type: 'bar',
+    data: {
+      labels: uptContrib.map(u => u.kode),
+      datasets: [{
+        label: 'Kegiatan dilaksanakan',
+        data: uptContrib.map(u => u.jumlah),
+        backgroundColor: '#0f6e56',
+        borderRadius: 4,
+        barThickness: 18
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { title: ctx => uptContrib[ctx[0].dataIndex].nama, label: ctx => ctx.parsed.y + ' kegiatan' } }
+      },
+      scales: {
+        x: { ticks: { color: '#5a6b6a', font: { size: 10, weight: '600' } }, grid: { display: false } },
+        y: { beginAtZero: true, ticks: { color: '#8a9594', stepSize: 1 }, grid: { color: '#f0ebdd' } }
+      }
+    }
+  });
+
+  // 6. COORDINATION WARNINGS
+  const warnings = [];
+
+  // Deteksi: bidang dengan beban sangat timpang
+  const maxWork = Math.max(...workloadData.map(w => w.kegiatan));
+  const minWork = Math.min(...workloadData.filter(w => w.kegiatan > 0).map(w => w.kegiatan));
+  if (maxWork / Math.max(minWork, 1) > 4) {
+    const bidangMax = workloadData.find(w => w.kegiatan === maxWork);
+    const bidangMin = workloadData.find(w => w.kegiatan === minWork);
+    warnings.push({ prio: 'med', title: 'Ketimpangan beban kerja antar-bidang', text: `${bidangMax.nama} menangani ${bidangMax.kegiatan} kegiatan sementara ${bidangMin.nama} hanya ${bidangMin.kegiatan}. Pertimbangkan redistribusi atau kolaborasi lintas-bidang.` });
+  }
+
+  // Deteksi: UPT yang belum aktif sama sekali
+  const uptInactive = UPT.filter(u => pembinaanData.filter(p => p.upt === u.kode).length === 0);
+  if (uptInactive.length > 0) {
+    warnings.push({ prio: 'high', title: `${uptInactive.length} UPT belum tercatat melaksanakan kegiatan`, text: `UPT berikut belum muncul di database pembinaan: ${uptInactive.map(u => u.kode).join(', ')}. Pastikan kegiatan mereka terinput agar koordinasi tercatat akurat.` });
+  }
+
+  // Deteksi: pilar tanpa bidang penanggung jawab utama (Accountable) — dari matriks
+  const pilarTanpaA = PILAR.filter(p => !Object.values(TUPOKSI_MATRIX[p.key]).includes('A'));
+  if (pilarTanpaA.length > 0) {
+    warnings.push({ prio: 'high', title: 'Pilar tanpa penanggung jawab tunggal', text: `Pilar ${pilarTanpaA.map(p => p.label).join(', ')} tidak memiliki bidang dengan peran "A" (Accountable). Perlu penetapan SK yang jelas.` });
+  }
+
+  // Deteksi: pilar dengan banyak bidang Accountable (potensi tumpang-tindih)
+  PILAR.forEach(p => {
+    const aCount = Object.values(TUPOKSI_MATRIX[p.key]).filter(v => v === 'A').length;
+    if (aCount > 1) {
+      warnings.push({ prio: 'med', title: `Potensi tumpang-tindih pada pilar ${p.label}`, text: `Terdapat ${aCount} bidang dengan peran "A" (Accountable) — ini wajar untuk pilar lintas-sektoral, namun pastikan lingkup masing-masing diatur detail di SOP.` });
+    }
+  });
+
+  // Deteksi: IKM yang tidak match dengan bidang pembina ideal
+  const missMatch = pembinaanData.filter(p => {
+    const ikm = ikmData.find(i => i.id === p.ikm);
+    if (!ikm) return false;
+    const bidangIdeal = getBidangForSektor(ikm.sektor);
+    // kegiatan oleh bidang lain WAJAR untuk pilar cross-cutting, tapi untuk pilar Produksi hanya BID-1/BID-2
+    return p.pilar === 'Produksi' && p.bidang !== 'BID-1' && p.bidang !== 'BID-2';
+  });
+  if (missMatch.length > 0) {
+    warnings.push({ prio: 'low', title: 'Review akuntabilitas kegiatan pilar Produksi', text: `Ditemukan ${missMatch.length} kegiatan pilar Produksi yang dijalankan di luar Bidang Industri Agro/Non-Agro. Konfirmasi kesesuaian dengan SOP.` });
+  }
+
+  // Insight positif: koordinasi berjalan
+  warnings.push({ prio: 'low', title: 'Good practice: koordinasi cross-bidang aktif', text: `${[...new Set(pembinaanData.map(p => p.bidang))].length} dari 6 bidang tercatat aktif menginisiasi kegiatan. UPT juga terlibat di ${[...new Set(pembinaanData.filter(p => p.upt).map(p => p.upt))].length} aktivitas teknis.` });
+
+  document.getElementById('coordWarnings').innerHTML = warnings.map((w, idx) => `
+    <div class="rec-item priority-${w.prio}">
+      <div class="rec-icon">${String(idx + 1).padStart(2, '0')}</div>
+      <div class="rec-body">
+        <div class="rec-title">${w.title}</div>
+        <div class="rec-text">${w.text}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   ANALITIK PARIPURNA PAGE
+   ============================================================ */
+
+let chartGap;
+
+function heatLevel(v) {
+  if (v >= 90) return 'heat-6';
+  if (v >= 80) return 'heat-5';
+  if (v >= 70) return 'heat-4';
+  if (v >= 55) return 'heat-3';
+  if (v >= 40) return 'heat-2';
+  if (v >= 25) return 'heat-1';
+  return 'heat-0';
+}
+
+function renderAnalitik() {
+  // HEATMAP
+  const top = [...ikmData].sort((a, b) => avgPilar(b) - avgPilar(a)).slice(0, 15);
+
+  let heatHTML = `<div class="heatmap">
+    <div class="heatmap-row head">
+      <div class="heatmap-cell label">IKM</div>
+      ${PILAR.map(p => `<div class="heatmap-cell">${p.label}</div>`).join('')}
+    </div>
+    ${top.map(i => `
+      <div class="heatmap-row">
+        <div class="heatmap-cell label" style="background: var(--white); font-size: 11px; font-weight: 500;">${i.nama.length > 24 ? i.nama.slice(0,22)+'…' : i.nama}</div>
+        ${PILAR.map(p => `<div class="heatmap-cell ${heatLevel(i[p.key])}">${i[p.key]}</div>`).join('')}
+      </div>
+    `).join('')}
+  </div>`;
+  document.getElementById('heatmapContainer').innerHTML = heatHTML;
+
+  // GAP CHART
+  const avgByPilar = PILAR.map(p => ({
+    label: p.label,
+    avg: Math.round(ikmData.reduce((s, i) => s + i[p.key], 0) / ikmData.length)
+  }));
+
+  if (chartGap) chartGap.destroy();
+  chartGap = new Chart(document.getElementById('gapChart'), {
+    type: 'bar',
+    data: {
+      labels: avgByPilar.map(a => a.label),
+      datasets: [
+        {
+          label: 'Capaian',
+          data: avgByPilar.map(a => a.avg),
+          backgroundColor: avgByPilar.map(a => a.avg >= 75 ? '#0f6e56' : a.avg >= 60 ? '#ef9f27' : '#e24b4a'),
+          borderRadius: 6
+        },
+        {
+          label: 'Target',
+          data: avgByPilar.map(() => 80),
+          backgroundColor: '#e6ddc9',
+          borderRadius: 6
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', align: 'end', labels: { boxWidth: 10, boxHeight: 10, font: { size: 11 }, color: '#5a6b6a' } },
+        tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.parsed.y + '%' } }
+      },
+      scales: {
+        x: { ticks: { color: '#1a2e2b', font: { size: 10, weight: '500' }, maxRotation: 30, minRotation: 20 }, grid: { display: false } },
+        y: { beginAtZero: true, max: 100, ticks: { color: '#8a9594', stepSize: 20, callback: v => v + '%' }, grid: { color: '#f0ebdd' } }
+      }
+    }
+  });
+
+  // REKOMENDASI
+  const sorted = [...avgByPilar].sort((a, b) => a.avg - b.avg);
+  const rekom = [];
+  if (sorted[0].avg < 70) {
+    rekom.push({ prio: 'high', title: `Pilar ${sorted[0].label} jadi bottleneck utama`, text: `Rata-rata capaian hanya ${sorted[0].avg}% — paling rendah dari 6 pilar. Alokasikan minimal 40% anggaran pembinaan Q4 ke pilar ini.` });
+  }
+  if (sorted[1].avg < 75) {
+    rekom.push({ prio: 'med', title: `Pilar ${sorted[1].label} butuh perhatian khusus`, text: `Capaian ${sorted[1].avg}% masih di bawah target 80%. Pertimbangkan program kolaborasi dengan OPD terkait atau mitra eksternal.` });
+  }
+  // IKM paling dekat paripurna
+  const near = ikmData.filter(i => getStatus(i) !== 'Paripurna' && avgPilar(i) >= 70).sort((a, b) => avgPilar(b) - avgPilar(a)).slice(0, 3);
+  if (near.length > 0) {
+    rekom.push({ prio: 'low', title: `${near.length} IKM siap "naik kelas" jadi Paripurna`, text: `${near.map(n => n.nama.split(' ').slice(0, 3).join(' ')).join(', ')} sudah rata-rata ≥70%. Fokuskan intervensi pada pilar terendah masing-masing.` });
+  }
+  const totalBelum = ikmData.filter(i => getStatus(i) === 'Belum').length;
+  if (totalBelum > 3) {
+    rekom.push({ prio: 'med', title: `${totalBelum} IKM masuk kategori "Belum Terbina"`, text: `Mayoritas belum memiliki legalitas dasar. Prioritaskan program fasilitasi NIB-PIRT massal dalam 2 bulan ke depan.` });
+  }
+  rekom.push({ prio: 'low', title: 'Replikasi best practice', text: `IKM Paripurna (${ikmData.filter(i => getStatus(i) === 'Paripurna').length}) bisa jadi mentor/co-trainer untuk IKM binaan baru — low-cost, high-impact.` });
+
+  document.getElementById('rekomendasiList').innerHTML = rekom.map((r, idx) => `
+    <div class="rec-item priority-${r.prio}">
+      <div class="rec-icon">${String(idx + 1).padStart(2, '0')}</div>
+      <div class="rec-body">
+        <div class="rec-title">${r.title}</div>
+        <div class="rec-text">${r.text}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   UPLOAD PAGE
+   ============================================================ */
+
+let parsedRows = null;
+
+document.getElementById('csvInput').addEventListener('change', (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  Papa.parse(f, {
+    header: true,
+    skipEmptyLines: true,
+    complete: (res) => {
+      parsedRows = res.data;
+      const cols = Object.keys(parsedRows[0] || {});
+      document.getElementById('previewSubtitle').textContent = `${parsedRows.length} baris · ${cols.length} kolom · ${f.name}`;
+      document.getElementById('previewHead').innerHTML = '<tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr>';
+      document.getElementById('previewBody').innerHTML = parsedRows.slice(0, 10).map(r => '<tr>' + cols.map(c => `<td style="font-size:11px;">${r[c] ?? ''}</td>`).join('') + '</tr>').join('');
+      document.getElementById('uploadPreview').style.display = 'block';
+      toast('File berhasil diparsing. Review preview, lalu klik Simpan.');
+    },
+    error: () => toast('Gagal membaca file CSV.')
+  });
+});
+
+function cancelUpload() {
+  parsedRows = null;
+  document.getElementById('csvInput').value = '';
+  document.getElementById('uploadPreview').style.display = 'none';
+}
+
+// Sync helpers for bidang/UPT selector
+function updateUploaderBadge() {
+  const bidangVal = document.getElementById('uploadBidangSelect').value;
+  const uptVal    = document.getElementById('uploadUptSelect').value;
+  const badge     = document.getElementById('uploaderBadge');
+  const badgeText = document.getElementById('uploaderBadgeText');
+  if (!bidangVal) { badge.style.display = 'none'; return; }
+  const bidang = BIDANG.find(b => b.kode === bidangVal);
+  const upt    = uptVal ? UPT.find(u => u.kode === uptVal) : null;
+  badgeText.textContent = bidang ? bidang.singkat + (upt ? ' / ' + upt.kode : '') : '—';
+  badge.style.display = 'block';
+}
+
+function syncUptToEmpty() {
+  updateUploaderBadge();
+}
+
+function syncBidangFromUpt() {
+  const uptVal = document.getElementById('uploadUptSelect').value;
+  if (uptVal) {
+    const upt = UPT.find(u => u.kode === uptVal);
+    if (upt && upt.bidangInduk) {
+      document.getElementById('uploadBidangSelect').value = upt.bidangInduk;
+    }
+  }
+  updateUploaderBadge();
+}
+
+function confirmUpload() {
+  if (!parsedRows) return;
+  const bidangVal = document.getElementById('uploadBidangSelect').value;
+  const uptVal = document.getElementById('uploadUptSelect').value;
+  if (!bidangVal) {
+    toast('⚠ Pilih Bidang pengunggah terlebih dahulu sebelum menyimpan.');
+    return;
+  }
+  const uploaderTag = uptVal ? `${bidangVal}|${uptVal}` : bidangVal;
+  let added = 0;
+  parsedRows.forEach((r, idx) => {
+    if (!r.nama) return;
+    const newId = 'IKM-2026-' + String(ikmData.length + 1 + idx).padStart(3, '0');
+    ikmData.push({
+      id: newId,
+      nama: r.nama,
+      no_telp: r.no_telp || '-',
+      pemilik: r.pemilik || '-',
+      kabkota: r.kabkota || 'Surabaya',
+      sektor: r.sektor || 'Makanan & Minuman',
+      pegawai: parseInt(r.pegawai) || 5,
+      omset_jt: parseInt(r.omset_jt) || 50,
+      legalitas: parseInt(r.legalitas) || 0,
+      produksi: parseInt(r.produksi) || 0,
+      sdm: parseInt(r.sdm) || 0,
+      pemasaran: parseInt(r.pemasaran) || 0,
+      pembiayaan: parseInt(r.pembiayaan) || 0,
+      kemitraan: parseInt(r.kemitraan) || 0,
+      bidang_upload: uploaderTag,
+      lastPembinaan: new Date().toISOString().slice(0, 10)
+    });
+    added++;
+  });
+  saveAll();
+  toast(`${added} IKM berhasil ditambahkan dari ${bidangVal}${uptVal ? ' / ' + uptVal : ''}`);
+  cancelUpload();
+  setTimeout(() => goTo('profil'), 800);
+}
+
+function downloadTemplate() {
+  const header = 'nama,no_telp,pemilik,kabkota,sektor,pegawai,omset_jt,legalitas,produksi,sdm,pemasaran,pembiayaan,kemitraan\n';
+  const sample = [
+    'Kopi Lokal Rasa Nusantara,0812-3456-7890,Bapak Surya,Probolinggo,Makanan & Minuman,6,85,70,60,55,50,40,45',
+    'Tas Anyam Sidoarjo,0856-7890-1234,Ibu Ani,Sidoarjo,Kerajinan,4,55,60,50,45,40,30,35'
+  ].join('\n');
+  const csv = header + sample;
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'template_simpikm.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('Template CSV berhasil diunduh.');
+}
+
+function exportCSV() {
+  const header = 'id,nama,no_telp,pemilik,kabkota,sektor,pegawai,omset_jt,legalitas,produksi,sdm,pemasaran,pembiayaan,kemitraan,bidang_upload,status\n';
+  const rows = ikmData.map(i => [
+    i.id, `"${i.nama}"`, `"${i.no_telp || '-'}"`, `"${i.pemilik}"`, i.kabkota, `"${i.sektor}"`, i.pegawai, i.omset_jt,
+    i.legalitas, i.produksi, i.sdm, i.pemasaran, i.pembiayaan, i.kemitraan, i.bidang_upload || '-', getStatus(i)
+  ].join(',')).join('\n');
+  const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'simpikm_export_' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  saveAll();
+  toast(`${ikmData.length} data IKM berhasil diexport ke CSV`);
+}
+
+function exportReport() {
+  toast('Fitur Export Laporan PDF — on the roadmap untuk versi produksi.');
+}
+
+/* ============================================================
+   TENTANG PAGE
+   ============================================================ */
+
+function renderTentang() {
+  const html = PILAR.map((p, idx) => `
+    <div class="pilar-card" style="padding: 18px 20px;">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+        <div style="width:36px; height:36px; background:var(--teal-50); color:var(--teal-800); border-radius:10px; display:flex; align-items:center; justify-content:center; font-family:'Fraunces', serif; font-weight:700; font-size:14px;">${String(idx + 1).padStart(2, '0')}</div>
+        <div>
+          <div style="font-family:'Fraunces', serif; font-size:16px; font-weight:600; color:var(--ink);">${p.full}</div>
+          <div style="font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.08em; font-weight:600;">Pilar ${idx + 1}</div>
+        </div>
+      </div>
+      <div style="font-size:13px; color:var(--ink-muted); line-height:1.55; margin-bottom:10px;">${p.desc}</div>
+      <div class="pilar-items">
+        ${p.items.map(i => `<span class="pilar-item done">${i}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('pilarInfoContainer').innerHTML = html;
+}
+
+/* ============================================================
+   INITIALIZE
+   ============================================================ */
+
+document.addEventListener('DOMContentLoaded', () => {
+  const loaded = loadFromStorage();
+  renderDashboard();
+  if (loaded) {
+    setTimeout(() => toast('✓ Data tersimpan sebelumnya berhasil dimuat dari browser'), 600);
+  }
+});
+
+// Also render immediately since DOMContentLoaded may have fired
+loadFromStorage();
+renderDashboard();
+</script>
+</body>
+</html>
